@@ -1,0 +1,592 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Machine">
+  <members xsi:type="varlink:EnumDefinition" name="MachineClass">
+    <documentation>The class of a machine</documentation>
+    <body>
+      <values name="container"/>
+      <values name="vm"/>
+      <values name="host"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="KillWhom">
+    <documentation>What to send a signal to in a machine</documentation>
+    <body>
+      <values name="leader"/>
+      <values name="supervisor"/>
+      <values name="all"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="AcquireMetadata">
+    <documentation>A enum field allowing to gracefully get metadata</documentation>
+    <body>
+      <values name="no">
+        <documentation>Do not include metadata in the output</documentation>
+      </values>
+      <values name="yes">
+        <documentation>Include metadata in the output</documentation>
+      </values>
+      <values name="graceful">
+        <documentation>Include metadata in the output, but gracefully eat up errors</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="MachineOpenMode">
+    <documentation>A enum field which defines way to open TTY for a machine</documentation>
+    <body>
+      <values name="tty">
+        <documentation>This mode allocates a pseudo TTY in the container and returns a file descriptor and its path. This is equivalent to transitioning into the container and invoking posix_openpt(3).</documentation>
+      </values>
+      <values name="login">
+        <documentation>This mode allocates a pseudo TTY in the container and ensures that a getty login prompt of the container is running on the other end. It returns the file descriptor of the PTY and the PTY path. This is useful for acquiring a pty with a login prompt from the container.</documentation>
+      </values>
+      <values name="shell">
+        <documentation>This mode allocates a pseudo TTY in the container, as the specified user, and invokes the executable at the specified path with a list of arguments (starting from argv[0]) and an environment block. It then returns the file descriptor of the PTY and the PTY path.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ProcessId">
+    <documentation>An object for referencing UNIX processes</documentation>
+    <body>
+      <fields name="pid">
+        <documentation>Numeric UNIX PID value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="pidfdId">
+        <documentation>64bit inode number of pidfd if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="bootId">
+        <documentation>Boot ID of the system the inode number belongs to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Timestamp">
+    <documentation>A timestamp object consisting of both CLOCK_REALTIME and CLOCK_MONOTONIC timestamps</documentation>
+    <body>
+      <fields name="realtime">
+        <documentation>Timestamp in µs in the CLOCK_REALTIME clock (wallclock)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="monotonic">
+        <documentation>Timestamp in µs in the CLOCK_MONOTONIC clock</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Address">
+    <documentation>An address object</documentation>
+    <body>
+      <fields name="ifindex">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="family">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="address">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Register">
+    <input>
+      <fields name="name">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="id">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="service">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="class">
+        <type xsi:type="varlink:NamedTypeReference" typeName="MachineClass" definition="//@members[name='MachineClass']"/>
+      </fields>
+      <fields name="leader">
+        <documentation>The leader PID as simple positive integer.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="leaderProcessId">
+        <documentation>The leader PID as ProcessId structure. If both the leader and leaderProcessId parameters are specified they must reference the same process. Typically one would only specify one or the other however. It's generally recommended to specify leaderProcessId as it references a process in a robust way without risk of identifier recycling.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="supervisor">
+        <documentation>The supervisor PID as simple positive integer. Deprecated and ignored: the supervisor is now always derived from the caller's socket (kept for backward compatibility).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="supervisorProcessId">
+        <documentation>The supervisor PID as ProcessId structure. Deprecated and ignored: the supervisor is now always derived from the caller's socket (kept for backward compatibility).</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="rootDirectory">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ifIndices">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="vSockCid">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="sshAddress">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="sshPrivateKeyPath">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="controlAddress">
+        <documentation>Varlink socket address for direct machine control. The server at this address is expected to implement io.systemd.MachineInstance and optionally io.systemd.VirtualMachineInstance.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allocateUnit">
+        <documentation>Controls whether to allocate a scope unit for the machine to register. If false, the client already took care of that and registered a service/scope specific to the machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Unregister">
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Terminate">
+    <documentation>Terminate machine, killing its processes</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Kill">
+    <documentation>Send a UNIX signal to the machine's processes</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="whom">
+        <documentation>Identifier that specifies what precisely to send the signal to (either 'leader', 'supervisor', or 'all').</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="KillWhom" definition="//@members[name='KillWhom']" nullable="true"/>
+      </fields>
+      <fields name="signal">
+        <documentation>Numeric UNIX signal integer.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="List" moreSupport="supported">
+    <documentation>List running machines</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="acquireMetadata">
+        <documentation>If 'yes' the output will include machine metadata fields such as 'Addresses', 'OSRelease', and 'UIDShift'. If 'graceful' it's equal to true but gracefully eats up errors</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="AcquireMetadata" definition="//@members[name='AcquireMetadata']" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Name of the machine</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="id">
+        <documentation>128bit ID identifying this machine, formatted in hexadecimal</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="service">
+        <documentation>Name of the software that registered this machine</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="class">
+        <documentation>The class of this machine</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="MachineClass" definition="//@members[name='MachineClass']"/>
+      </fields>
+      <fields name="leader">
+        <documentation>Leader process PID of this machine</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="supervisor">
+        <documentation>Supervisor process PID of this machine</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="rootDirectory">
+        <documentation>Root directory of this machine, if known, relative to host file system</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="unit">
+        <documentation>The service manager unit this machine resides in</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="timestamp">
+        <documentation>Timestamp when the machine was activated</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="vSockCid">
+        <documentation>AF_VSOCK CID of the machine if known and applicable</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="sshAddress">
+        <documentation>SSH address to connect to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="sshPrivateKeyPath">
+        <documentation>Path to private SSH key</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="controlAddress">
+        <documentation>Varlink socket address for direct machine control, implementing io.systemd.MachineInstance and optionally further interfaces</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="addresses">
+        <documentation>List of addresses of the machine</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Address" definition="//@members[name='Address']"/>
+        </type>
+      </fields>
+      <fields name="OSRelease">
+        <documentation>OS release information of the machine. It contains an array of key value pairs read from the os-release(5) file in the image.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="UIDShift">
+        <documentation>Return the base UID/GID of the machine</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="subgroup">
+        <documentation>Subcgroup path of the machine, relative to the unit's cgroup path</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="UID">
+        <documentation>Numeric UNIX UID of the user who registered the machine</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Open">
+    <documentation>Allocates a pseudo TTY in the container in various modes</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="mode">
+        <documentation>There are three possible values: 'tty', 'login', and 'shell'. Please see description for each of the modes.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="MachineOpenMode" definition="//@members[name='MachineOpenMode']"/>
+      </fields>
+      <fields name="user">
+        <documentation>See description of mode='shell'. Valid only when mode='shell'</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="path">
+        <documentation>See description of mode='shell'. Valid only when mode='shell'</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="args">
+        <documentation>See description of mode='shell'. Valid only when mode='shell'</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="environment">
+        <documentation>See description of mode='shell'. Valid only when mode='shell'</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </input>
+    <output>
+      <fields name="ptyFileDescriptor">
+        <documentation>File descriptor of the allocated pseudo TTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ptyPath">
+        <documentation>Path to the allocated pseudo TTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="MapFrom">
+    <documentation>Maps given machine's UID/GID to host's UID/GID</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="uid">
+        <documentation>UID in the machine to map to host UID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="gid">
+        <documentation>GID in the machine to map to host GID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="uid">
+        <documentation>Mapped UID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="gid">
+        <documentation>Mapped GID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="MapTo">
+    <documentation>Maps given host's UID/GID to a machine and corresponding UID/GID</documentation>
+    <input>
+      <fields name="uid">
+        <documentation>Host UID to map to machine UID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="gid">
+        <documentation>Host GID to map to machine GID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="uid">
+        <documentation>Mapped UID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="gid">
+        <documentation>Mapped GID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="machineName">
+        <documentation>Machine's name which owns mapped UID/GID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="BindMount">
+    <documentation>Bind mounts a file or directory from the host into the container</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="source">
+        <documentation>The source directory/file on the host. The path must be absolute.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="destination">
+        <documentation>The destination directory/file in the container. The path must be absolute. If null, it's equal to 'source'</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>If true, the bind mount shall be read-only</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="mkdir">
+        <documentation>The destination mount point shall be created first, if it is missing</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="CopyFrom">
+    <documentation>Copy files or directories from a container into the host</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="source">
+        <documentation>The absolute path to source directory/file in the container</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="destination">
+        <documentation>The absolute path to destination directory/file on the host. If null, it's equal to 'source'.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="replace">
+        <documentation>If true the destination will be replaced</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="CopyTo">
+    <documentation>Copy files or directories from the host into a container</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="source">
+        <documentation>The absolute path to source directory/file on the host</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="destination">
+        <documentation>The absolute path to destination directory/file in the container. If null, it's equal to 'source'</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="replace">
+        <documentation>If true the destination will be replaced</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="OpenRootDirectory">
+    <documentation>Opens machine's root directory</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a machine.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>If non-null the PID of a machine. Special value 0 means to take pid of the machine the caller is part of.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="fileDescriptor">
+        <documentation>File descriptor of opened root directory</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchMachine">
+    <documentation>No matching machine currently running</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="MachineExists">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoPrivateNetworking">
+    <documentation>Machine does not use private networking</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoOSReleaseInformation">
+    <documentation>Machine does not contain OS release information</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoUIDShift">
+    <documentation>Machine uses a complex UID/GID mapping, cannot determine shift</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NotAvailable">
+    <documentation>Requested information is not available</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NotSupported">
+    <documentation>Requested operation is not supported</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoIPC">
+    <documentation>There is no IPC service (such as system bus or varlink) in the container</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchUser">
+    <documentation>No such user</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchGroup">
+    <documentation>No such group</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="UserInHostRange">
+    <documentation>User belongs to host UID range</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="GroupInHostRange">
+    <documentation>Group belongs to host GID range</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

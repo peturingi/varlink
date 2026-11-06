@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Journal">
+  <documentation>Journal control APIs</documentation>
+  <members xsi:type="varlink:Method" name="Synchronize">
+    <documentation>Write out all pending log messages out to disk, and reply only after that's complete.</documentation>
+    <input>
+      <fields name="offline">
+        <documentation>Controls whether to offline the journal files as part of the synchronization operation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Rotate">
+    <documentation>Rotate journal files, i.e. close existing files, start new ones.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="FlushToVar">
+    <documentation>Flush runtime logs to persistent logs, i.e. flush log data from /run/ into /var/, and continue writing future log data to the latter location.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="RelinquishVar">
+    <documentation>Relinquish use of /var/ again, return to do runtime logging into /run/ only.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NotSupportedByNamespaces">
+    <documentation>Journal service running as per-namespace instance, and requested operation is not supported for namespaced journal.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

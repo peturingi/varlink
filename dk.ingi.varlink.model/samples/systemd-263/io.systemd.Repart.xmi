@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Repart">
+  <documentation>API for declaratively re-partitioning disks using systemd-repart.</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="EmptyMode">
+    <documentation>Behaviors for disks that are completely empty (i.e. don't have a partition table yet)</documentation>
+    <body>
+      <values name="refuse">
+        <documentation>Refuse to operate on disks without an existing partition table</documentation>
+      </values>
+      <values name="allow">
+        <documentation>Create a new partition table if one doesn't already exist on disk</documentation>
+      </values>
+      <values name="require">
+        <documentation>Refuse to operate on disks with an existing partition table, and create a new table if none exists</documentation>
+      </values>
+      <values name="force">
+        <documentation>Always create a new partition table, potentially overwriting an existing table</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ProgressPhase">
+    <documentation>Progress phase identifiers. Note that we might add more phases here, and thus identifiers. Frontends can choose to display the phase to the user in some human readable form, or not do that, but if they do it and they receive a notification for a so far unknown phase, they should just ignore it.</documentation>
+    <body>
+      <values name="loading_definitions"/>
+      <values name="loading_table"/>
+      <values name="opening_copy_block_sources"/>
+      <values name="acquiring_partition_labels"/>
+      <values name="minimizing"/>
+      <values name="placing"/>
+      <values name="wiping_disk"/>
+      <values name="wiping_partition"/>
+      <values name="copying_partition"/>
+      <values name="formatting_partition"/>
+      <values name="adjusting_partition"/>
+      <values name="writing_table"/>
+      <values name="rereading_table"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="BlockDeviceAction">
+    <documentation>Discriminator on streamed ListCandidateDevices replies in subscribe mode.</documentation>
+    <body>
+      <values name="add">
+        <documentation>The device is currently present and a candidate. Emitted both during the initial enumeration and for live uevents (any action other than 'remove' is propagated as 'add', including the synthesized transitions when a device becomes empty or read-only and a relevant ignore* input is in effect).</documentation>
+      </values>
+      <values name="remove">
+        <documentation>The device is no longer a candidate, either because the kernel reported a remove event, or because a dynamic filter (ignoreEmpty/ignoreReadOnly) flipped it out of the candidate set. Clients should drop the device identified by 'node'. It is permitted (and harmless) to receive a 'remove' for a device the client never saw an 'add' for; clients should ignore these silently.</documentation>
+      </values>
+      <values name="ready">
+        <documentation>Sentinel sent exactly once in subscribe mode, after the initial enumeration is complete. Everything that follows reflects live uevents. Carries no other fields.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Run" moreSupport="supported">
+    <documentation>Invoke the actual repartitioning operation, either in dry-run mode or for real. If invoked with 'more' enabled will report progress, otherwise will just report completion.</documentation>
+    <input>
+      <fields name="node">
+        <documentation>Full path to the block device node to operate on. If omitted, dryRun must be true, in which case the minimal disk size is determined.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="empty">
+        <documentation>Decides whether to install the OS in addition to what is already on it, or if it shall be erased.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="EmptyMode" definition="//@members[name='EmptyMode']"/>
+      </fields>
+      <fields name="dryRun">
+        <documentation>If true this will ponder if the installation would fit, but does not actually write anything to disk. Must be set to false to actually make changes.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="seed">
+        <documentation>The seed value to derive partition and file system UUIDs from</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="definitions">
+        <documentation>Path to directory containing definition files.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="deferPartitionsEmpty">
+        <documentation>If true, automatically defer creation of all partitions whose label is "empty".</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="deferPartitionsFactoryReset">
+        <documentation>If true, automatically defer creation of all partitions which are marked for factory reset.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="minimalSizeBytes">
+        <documentation>In dry-run mode returns the minimal disk size required.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="currentSizeBytes">
+        <documentation>In dry-run mode returns the size of the selected block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="partitionCount">
+        <documentation>Returns the number of partitions currently on the selected block device. Omitted if not determined by the workflow, e.g. if the existing partition table was not read because empty mode 'force' or 'require' was selected.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="phase">
+        <documentation>If used with the 'more' flag, a phase identifier is sent in progress updates.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProgressPhase" definition="//@members[name='ProgressPhase']" nullable="true"/>
+      </fields>
+      <fields name="object">
+        <documentation>If used with the 'more' flag, an object identifier string is sent in progress updates.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="progress">
+        <documentation>If used with the 'more' flag, a progress percentage (specific to the work done for the specified phase+object).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListCandidateDevices" moreSupport="required">
+    <documentation>Return a list of candidate block devices, i.e. that support partition scanning and other requirements for successful operation.</documentation>
+    <input>
+      <fields name="ignoreRoot">
+        <documentation>Control whether to include the root disk of the currently booted OS in the list. Defaults to false, i.e. the root disk is included.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="ignoreEmpty">
+        <documentation>Control whether to include block devices with zero size in the list, i.e. typically block devices without any inserted medium. Defaults to false, i.e. empty block devices are included.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="subscribe">
+        <documentation>If true, keep the call open after the initial enumeration and stream live add/remove notifications as block-subsystem uevents arrive. The end of the initial enumeration is marked by exactly one notification with action='ready' and no other fields. Defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="action">
+        <documentation>Discriminator field. Only set in subscribe mode. 'add' carries the full device record, 'remove' carries only node, 'ready' carries no other fields and is sent once after the initial enumeration.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BlockDeviceAction" definition="//@members[name='BlockDeviceAction']" nullable="true"/>
+      </fields>
+      <fields name="node">
+        <documentation>The device node path of the block device. Identifies the device on 'remove' too.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="symlinks">
+        <documentation>List of symlinks pointing to the device node, if any.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="diskseq">
+        <documentation>The Linux kernel disk sequence number identifying the medium.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="sizeBytes">
+        <documentation>The size of the block device in bytes.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="vendor">
+        <documentation>The device vendor string if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="model">
+        <documentation>The device model string if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="subsystem">
+        <documentation>The subsystem the block device belongs to if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ConflictingDiskLabelPresent">
+    <documentation>An incompatible disk label present, and not told to erase it.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InsufficientFreeSpace">
+    <documentation>The target disk has insufficient free space to fit all requested partitions. (But the disk would fit, if emptied.)</documentation>
+    <parameters>
+      <fields name="minimalSizeBytes">
+        <documentation>Minimal size of the disk required for the installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="needFreeBytes">
+        <documentation>Additional free space needed on the selected disk.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="currentSizeBytes">
+        <documentation>Size of the selected block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="DiskTooSmall">
+    <documentation>The target disk is too small to fit the installation. (Regardless if emptied or not.)</documentation>
+    <parameters>
+      <fields name="minimalSizeBytes">
+        <documentation>Minimal size of the disk required for the installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="currentSizeBytes">
+        <documentation>Actual size of the selected block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoCandidateDevices">
+    <documentation>Not a single candidate block device could be found.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

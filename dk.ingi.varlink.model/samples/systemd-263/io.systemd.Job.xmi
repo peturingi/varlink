@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Job">
+  <documentation>Job management interface for the systemd service manager.</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="JobType">
+    <documentation>Job type</documentation>
+    <body>
+      <values name="start"/>
+      <values name="verify_active"/>
+      <values name="stop"/>
+      <values name="reload"/>
+      <values name="reload_or_start"/>
+      <values name="restart"/>
+      <values name="try_restart"/>
+      <values name="try_reload"/>
+      <values name="nop"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="JobState">
+    <documentation>Job state</documentation>
+    <body>
+      <values name="waiting"/>
+      <values name="running"/>
+      <values name="finished"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="JobResult">
+    <documentation>Job result</documentation>
+    <body>
+      <values name="done"/>
+      <values name="canceled"/>
+      <values name="timeout"/>
+      <values name="failed"/>
+      <values name="dependency"/>
+      <values name="skipped"/>
+      <values name="invalid"/>
+      <values name="assert"/>
+      <values name="unsupported"/>
+      <values name="collected"/>
+      <values name="once"/>
+      <values name="frozen"/>
+      <values name="concurrency"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Job">
+    <documentation>A job object</documentation>
+    <body>
+      <fields name="Id">
+        <documentation>The numeric job ID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Unit">
+        <documentation>The unit name this job operates on</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="JobType">
+        <documentation>The job type</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="JobType" definition="//@members[name='JobType']"/>
+      </fields>
+      <fields name="State">
+        <documentation>Current job state. 'finished' indicates the job has completed; in that case Result is also set.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="JobState" definition="//@members[name='JobState']" nullable="true"/>
+      </fields>
+      <fields name="Result">
+        <documentation>Job result. Only set once the job has reached the 'finished' state.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="JobResult" definition="//@members[name='JobResult']" nullable="true"/>
+      </fields>
+      <fields name="ActivationDetails">
+        <documentation>Activation details describing what triggered this job, as key-value pairs</documentation>
+        <type xsi:type="varlink:MapType" nullable="true">
+          <valueType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="List" moreSupport="supported">
+    <documentation>List queued jobs</documentation>
+    <input>
+      <fields name="id">
+        <documentation>If non-null, filter by job ID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="unit">
+        <documentation>If non-null, filter by unit name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="Id">
+        <documentation>The numeric job ID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Unit">
+        <documentation>The unit name this job operates on</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="JobType">
+        <documentation>The job type</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="JobType" definition="//@members[name='JobType']"/>
+      </fields>
+      <fields name="State">
+        <documentation>Current job state. 'finished' indicates the job has completed; in that case Result is also set.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="JobState" definition="//@members[name='JobState']" nullable="true"/>
+      </fields>
+      <fields name="Result">
+        <documentation>Job result. Only set once the job has reached the 'finished' state.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="JobResult" definition="//@members[name='JobResult']" nullable="true"/>
+      </fields>
+      <fields name="ActivationDetails">
+        <documentation>Activation details describing what triggered this job, as key-value pairs</documentation>
+        <type xsi:type="varlink:MapType" nullable="true">
+          <valueType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Cancel">
+    <documentation>Cancel a specific job</documentation>
+    <input>
+      <fields name="id">
+        <documentation>The job ID to cancel</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="ClearAll">
+    <documentation>Cancel all pending jobs</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchJob">
+    <documentation>The specified job does not exist</documentation>
+    <parameters>
+      <fields name="parameter">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+</varlink:Interface>

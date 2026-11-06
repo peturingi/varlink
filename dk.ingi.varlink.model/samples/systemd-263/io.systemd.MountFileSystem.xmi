@@ -1,0 +1,276 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.MountFileSystem">
+  <documentation>APIs for unprivileged mounting.</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="PartitionDesignator">
+    <documentation>Encodes the designated purpose of a partition.</documentation>
+    <body>
+      <values name="root"/>
+      <values name="usr"/>
+      <values name="home"/>
+      <values name="srv"/>
+      <values name="esp"/>
+      <values name="xbootldr"/>
+      <values name="swap"/>
+      <values name="root_verity"/>
+      <values name="usr_verity"/>
+      <values name="root_verity_sig"/>
+      <values name="usr_verity_sig"/>
+      <values name="tmp"/>
+      <values name="var"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="MountMapMode">
+    <documentation>Selects the type of UID/GID mapping to apply.</documentation>
+    <body>
+      <values name="root">
+        <documentation>Map the caller's UID to root in the user namespace, do not map anything else.</documentation>
+      </values>
+      <values name="foreign">
+        <documentation>Map the foreign UID range to the base UID range in the user namespace (i.e. UID zero and above), covering 64K users.</documentation>
+      </values>
+      <values name="identity">
+        <documentation>Apply an identity (1:1) mapping, but limit it to 64K users.</documentation>
+      </values>
+      <values name="auto">
+        <documentation>Determine automatically based on provided directory and caller.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="PartitionInfo">
+    <documentation>Information about a specific partition.</documentation>
+    <body>
+      <fields name="designator">
+        <documentation>The designator of this partition.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="PartitionDesignator" definition="//@members[name='PartitionDesignator']"/>
+      </fields>
+      <fields name="writable">
+        <documentation>Indicates whether this partition is marked for writable (non-read-only) operations.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="growFileSystem">
+        <documentation>Indicates whether this partition is marked for automatic growing.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="partitionNumber">
+        <documentation>Indicates the numeric partition number of this partition, or null if the image does not carry a partition table, and this object covers the whole block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="architecture">
+        <documentation>Indicates the intended CPU architecture of the partition, in case the partition type encodes such information.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="partitionUuid">
+        <documentation>The partition UUID identifying the partition.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fileSystemType">
+        <documentation>The file system type for the mount</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="partitionLabel">
+        <documentation>The partition label string of this partition.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="size">
+        <documentation>The size of the partition in bytes.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="offset">
+        <documentation>The start offset of the partition in bytes.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="mountFileDescriptor">
+        <documentation>A mount file descriptor to assign to a location.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="mountPoint">
+        <documentation>A relative path indicating the intended mount point for this file system, if applicable. May contain multiple paths, for certain partitions that can be mounted to multiple distinct places.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="MountImage">
+    <documentation>Takes a disk image file descriptor as input, returns a set of mount file descriptors for it, plus meta information about the image and the partitions selected for mounting.</documentation>
+    <input>
+      <fields name="imageFileDescriptor">
+        <documentation>File descriptor of the image file to mount and to assign to the user namespace. Must be a regular, i.e. non-O_PATH file descriptor.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="userNamespaceFileDescriptor">
+        <documentation>File descriptor to the user namespace to assign this image to. If not specified uses the host user namespace.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Mounts the image read-only.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="growFileSystems">
+        <documentation>Grows the contained file systems if necessary and indicated, before mounting them.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="password">
+        <documentation>Takes a literal password in case of an encrypted image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="imagePolicy">
+        <documentation>Takes an image policy string (see systemd.image-policy(7) for details) to apply while mounting the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="mountOptions">
+        <documentation>The mount options to be used for the partitions of the image, keyed by the partition designator. Requires elevated privileges via polkit if specified, the polkit request details will list them in the 'mount_options' field.</documentation>
+        <type xsi:type="varlink:MapType" nullable="true">
+          <valueType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="relaxExtensionReleaseChecks">
+        <documentation>Whether to relax the extension release checks when mounting the image.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="veritySharing">
+        <documentation>Whether to automatically reuse already set up dm-verity devices that share the same roothash. For unprivileged clients, the backing image file must also match.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="verityDataFileDescriptor">
+        <documentation>File descriptor of the file containing the dm-verity data, if the image is a bare filesystem rather than a DDI.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="verityRootHash">
+        <documentation>The expected dm-verity root hash as an hex encoded string, if the image is a bare filesystem rather than a DDI.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="verityRootHashSignature">
+        <documentation>The expected signature for the dm-verity root hash as a Base64 encoded string, if the image is a bare filesystem rather than a DDI.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="partitions">
+        <documentation>An array with information about contained partitions that have been prepared for mounting, as well as their mount file descriptors.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="PartitionInfo" definition="//@members[name='PartitionInfo']"/>
+        </type>
+      </fields>
+      <fields name="singleFileSystem">
+        <documentation>Indicates whether the image contains only a single file system, i.e. no partition table.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="imagePolicy">
+        <documentation>The used image policy.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="imageSize">
+        <documentation>The size of the image in bytes.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="sectorSize">
+        <documentation>The sector size of the image in bytes</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="imageName">
+        <documentation>The name of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="imageUuid">
+        <documentation>The UUID of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="MountDirectory">
+    <documentation>Takes a directory file descriptor as input, returns a mount file descriptor.</documentation>
+    <input>
+      <fields name="directoryFileDescriptor">
+        <documentation>Directory file descriptor of the directory to assign to the user namespace. Must be a regular, i.e. non-O_PATH file descriptor.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="userNamespaceFileDescriptor">
+        <documentation>File descriptor to the user namespace to assign this directory to. If not specified uses the host user namespace.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Whether to mark the resulting mount file descriptor as read-only. If not specified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="mode">
+        <documentation>Which kind of UID/GID mapping to apply to the resulting mount file descriptor.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="MountMapMode" definition="//@members[name='MountMapMode']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="mountFileDescriptor">
+        <documentation>The freshly allocated mount file descriptor for the mount.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="MakeDirectory">
+    <documentation>Creates an empty directory, owned by the foreign UID/GID range's root user, returns an open file descriptor to the directory. Access mode will be set to 0700.</documentation>
+    <input>
+      <fields name="parentFileDescriptor">
+        <documentation>File descriptor of the directory to create the new directory in. Must be a regular, i.e. non-O_PATH file descriptor.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="name">
+        <documentation>Name of the directory to create.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="mode">
+        <documentation>Access mode of the directory to create. Note that the suid, sgid, sticky, world-writable bit is unconditionally masked off.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="directoryFileDescriptor">
+        <documentation>File descriptor referencing the newly created directory.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="IncompatibleImage">
+    <documentation>Disk image is not compatible with this service.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="MultipleRootPartitionsFound">
+    <documentation>Multiple suitable root partitions found.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="RootPartitionNotFound">
+    <documentation>No suitable root partition found.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="DeniedByImagePolicy">
+    <documentation>The specified image policy disallows mounting this disk image</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="KeyNotFound">
+    <documentation>The authentication key for this image is not available.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="VerityFailure">
+    <documentation>Verity could not be set up.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="BadFileDescriptorFlags">
+    <documentation>A passed file descriptor has unexpected/forbidden flags set.</documentation>
+    <parameters>
+      <fields name="parameter">
+        <documentation>Name of the parameter referencing the file descriptor with one or more bad flags.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+</varlink:Interface>

@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.sysext">
+  <members xsi:type="varlink:EnumDefinition" name="ImageClass">
+    <body>
+      <values name="sysext"/>
+      <values name="confext"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ImageType">
+    <body>
+      <values name="directory"/>
+      <values name="subvolume"/>
+      <values name="raw"/>
+      <values name="block"/>
+      <values name="mstack"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Merge">
+    <input>
+      <fields name="class">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']" nullable="true"/>
+      </fields>
+      <fields name="force">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="noReload">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="noexec">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Unmerge">
+    <input>
+      <fields name="class">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']" nullable="true"/>
+      </fields>
+      <fields name="noReload">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Refresh">
+    <input>
+      <fields name="class">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']" nullable="true"/>
+      </fields>
+      <fields name="force">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="noReload">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="alwaysRefresh">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="noexec">
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="List" moreSupport="required">
+    <input>
+      <fields name="class">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="Class">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']"/>
+      </fields>
+      <fields name="Type">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageType" definition="//@members[name='ImageType']"/>
+      </fields>
+      <fields name="Name">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Path">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ReadOnly">
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="CreationTimestamp">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ModificationTimestamp">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Usage">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="UsageExclusive">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Limit">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="LimitExclusive">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoImagesFound">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="AlreadyMerged">
+    <parameters>
+      <fields name="hierarchy">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+</varlink:Interface>

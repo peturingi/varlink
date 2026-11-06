@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Hostname">
+  <documentation>APIs for querying and changing the system hostname and related machine metadata.</documentation>
+  <members xsi:type="varlink:Method" name="Describe">
+    <documentation>Returns hostname, kernel, OS, hardware, firmware and other machine metadata in one call.</documentation>
+    <input>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="Hostname">
+        <documentation>The current system hostname.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="StaticHostname">
+        <documentation>The statically configured hostname, from /etc/hostname. Null if none is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="PrettyHostname">
+        <documentation>The pretty (free-form, UTF-8) hostname. Null if none is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="DefaultHostname">
+        <documentation>The fallback hostname used when neither a static nor a transient hostname is set.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="HostnameSource">
+        <documentation>Indicates where the current hostname originates from, one of 'static', 'transient' or 'default'.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="IconName">
+        <documentation>The name of an icon representing this system, following the XDG icon naming spec. Null if none is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Chassis">
+        <documentation>The chassis type of this system, e.g. 'desktop', 'laptop', 'server', 'vm', … Null if unknown.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ChassisAssetTag">
+        <documentation>An unique identifier of the system chassis.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Deployment">
+        <documentation>The deployment environment of this system, e.g. 'production' or 'staging'. Null if none is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Location">
+        <documentation>A human-readable description of the physical location of this system. Null if none is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="KernelName">
+        <documentation>The operating system kernel name, as reported by uname(2), e.g. 'Linux'.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="KernelRelease">
+        <documentation>The kernel release string, as reported by uname(2).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="KernelVersion">
+        <documentation>The kernel version string, as reported by uname(2).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="OperatingSystemPrettyName">
+        <documentation>'Pretty' name of the OS. This is the primary OS identifier that is suitable for presentation to the user. Typically includes a version too, but doesn't have to.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="OperatingSystemFancyName">
+        <documentation>'Fancy' name of the OS; may contain non-ASCII Unicode chars, as well as basic ANSI sequences. This is similar to 'OperatingSystemPrettyName', but is preferably used on terminals that support ANSI sequences and full Unicode.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="OperatingSystemCPEName">
+        <documentation>The CPE name of the OS, from the CPE_NAME= field of os-release.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="OperatingSystemHomeURL">
+        <documentation>The home URL of the OS, from the HOME_URL= field of os-release.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="OperatingSystemSupportEnd">
+        <documentation>The end-of-support time of the OS, in µs since the UNIX epoch. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="OperatingSystemReleaseData">
+        <documentation>The full contents of os-release, as an array of 'KEY=VALUE' strings.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="OperatingSystemImageID">
+        <documentation>The OS image identifier, from the IMAGE_ID= field of os-release.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="OperatingSystemImageVersion">
+        <documentation>The OS image version, from the IMAGE_VERSION= field of os-release.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="MachineInformationData">
+        <documentation>The full contents of /etc/machine-info, as an array of 'KEY=VALUE' strings.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="MachineTags">
+        <documentation>The machine tags, from the TAGS= field of /etc/machine-info with any invalid tags filtered out. Empty if none are configured.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="HardwareVendor">
+        <documentation>The hardware vendor of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="HardwareModel">
+        <documentation>The hardware model of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="HardwareSerial">
+        <documentation>The hardware serial number of this system. Reading it requires privileges. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="HardwareSKU">
+        <documentation>The hardware SKU (stock keeping unit) of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="HardwareVersion">
+        <documentation>The hardware version of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="FirmwareVersion">
+        <documentation>The firmware version of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="FirmwareVendor">
+        <documentation>The firmware vendor of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="FirmwareDate">
+        <documentation>The firmware build date, in µs since the UNIX epoch. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="MachineID">
+        <documentation>The 128-bit machine ID of this system, formatted as a hexadecimal string.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="BootID">
+        <documentation>The 128-bit boot ID of the current boot, formatted as a hexadecimal string.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ProductUUID">
+        <documentation>The DMI product UUID of this system. Reading it requires privileges. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="VSockCID">
+        <documentation>The AF_VSOCK context ID (CID) of this system. Null if not known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="SetHostname">
+    <documentation>Sets the transient (runtime) hostname.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The transient (runtime) hostname to set. If null the transient hostname is reset, so that the static hostname is used again.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetStaticHostname">
+    <documentation>Sets the static hostname, stored in /etc/hostname.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The static hostname to set, stored in /etc/hostname. If null the static hostname is removed.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetPrettyHostname">
+    <documentation>Sets the pretty (free-form, UTF-8) hostname.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The pretty (free-form, UTF-8) hostname to set. If null the pretty hostname is removed.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetIconName">
+    <documentation>Sets the icon name representing this system.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The icon name to set. If null the icon name is removed.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetChassis">
+    <documentation>Sets the chassis type of this system.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The chassis type to set. If null the chassis type is removed.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetDeployment">
+    <documentation>Sets the deployment environment of this system.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The deployment environment to set. If null the deployment is removed.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetLocation">
+    <documentation>Sets the physical location of this system.</documentation>
+    <input>
+      <fields name="newValue">
+        <documentation>The physical location to set. If null the location is removed.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetTags">
+    <documentation>Edits the machine tag list: optionally resets it to 'set', then adds 'add' and removes 'remove'.</documentation>
+    <input>
+      <fields name="set">
+        <documentation>If specified, the machine tag list is first reset to exactly these tags, before the 'remove' and 'add' fields are applied. If null, the current tag list is used as basis instead.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="add">
+        <documentation>Machine tags to add to the list. A key=value tag replaces any assignment of the same key already in the list.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="remove">
+        <documentation>Machine tags to remove from the list. The removals are processed before the additions. Removals may include globs.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="ApplyTags">
+    <documentation>Applies the additions and removals declared in the machine-tags.d/ configuration files (see machine-tags.d(5)) on top of the current machine tag list.</documentation>
+    <input>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+</varlink:Interface>

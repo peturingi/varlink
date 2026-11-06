@@ -1,0 +1,39 @@
+# Monitor Varlink socket traffic via BPF.
+interface io.systemd.VarlinkMonitor
+
+# An object for referencing UNIX processes
+type ProcessId(
+	# Numeric UNIX PID value
+	pid: int,
+	# 64bit inode number of pidfd if known
+	pidfdId: ?int,
+	# Boot ID of the system the inode number belongs to
+	bootId: ?string
+)
+
+# A filter for matching varlink traffic.
+type MonitorFilter(
+	# Match traffic where sender or peer has this UID.
+	uid: ?int,
+	# Match traffic where sender or peer has this PID.
+	pid: ?ProcessId,
+	# Match traffic on this socket path. Empty string matches sockets without a path.
+	path: ?string
+)
+
+# Start monitoring varlink traffic with the given filters. Returns a BPF ring buffer fd and keeps the connection open until the client disconnects.
+# [Supports 'more' flag]
+method Acquire(
+	# Capture filters. Each filter's fields are ANDed; the array is ORed. If unset, captures all traffic.
+	filters: ?[]MonitorFilter,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# File descriptor index for the BPF ring buffer.
+	ringbufFileDescriptor: ?int
+)
+
+# A filter parameter is invalid.
+error BadFilter(
+	parameter: string
+)

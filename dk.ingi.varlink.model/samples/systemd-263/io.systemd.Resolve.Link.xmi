@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Resolve.Link">
+  <members xsi:type="varlink:StructDefinition" name="DNSServerContext">
+    <documentation>DNS server configuration input.</documentation>
+    <body>
+      <fields name="address">
+        <documentation>IPv4 or IPv6 address of the server.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="family">
+        <documentation>Address family of the server, one of AF_INET or AF_INET6.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="port">
+        <documentation>Port number of the server.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>Interface index for which this server is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <documentation>Server Name Indication (SNI) of the server.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="SetDNS">
+    <documentation>Set the per-link DNS server list.</documentation>
+    <input>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>Index of the interface to configure.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="servers">
+        <documentation>DNS servers to configure on the link</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSServerContext" definition="//@members[name='DNSServerContext']"/>
+        </type>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ManagedByNetworkd">
+    <documentation>The specified interface is managed by systemd-networkd. The request should be re-directed to systemd-networkd.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="IsLoopback">
+    <documentation>The specified interface is a loopback interface, and cannot be configured.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

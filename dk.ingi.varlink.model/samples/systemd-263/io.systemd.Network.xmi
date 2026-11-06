@@ -1,0 +1,1457 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Network">
+  <members xsi:type="varlink:EnumDefinition" name="DHCPv6ClientState">
+    <body>
+      <values name="stopped"/>
+      <values name="information_request"/>
+      <values name="solicitation"/>
+      <values name="request"/>
+      <values name="bound"/>
+      <values name="renew"/>
+      <values name="rebind"/>
+      <values name="stopping"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="LinkState">
+    <body>
+      <values name="pending"/>
+      <values name="initialized"/>
+      <values name="configuring"/>
+      <values name="configured"/>
+      <values name="unmanaged"/>
+      <values name="failed"/>
+      <values name="linger"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="LinkConfiguringReason">
+    <body>
+      <values name="traffic_control"/>
+      <values name="link_layer"/>
+      <values name="activation"/>
+      <values name="stacked_netdevs"/>
+      <values name="static_addresses"/>
+      <values name="static_address_labels"/>
+      <values name="static_bridge_fdb"/>
+      <values name="static_bridge_mdb"/>
+      <values name="static_neighbors"/>
+      <values name="static_neighbor_proxy"/>
+      <values name="static_nexthops"/>
+      <values name="static_routes"/>
+      <values name="static_routing_policy_rules"/>
+      <values name="sr_iov"/>
+      <values name="bearer"/>
+      <values name="ipv6ll"/>
+      <values name="static_address_not_ready"/>
+      <values name="dhcp4_6rd"/>
+      <values name="dhcp4_6rd_prefix"/>
+      <values name="dhcp6_pd"/>
+      <values name="dhcp6_pd_prefix"/>
+      <values name="dynamic_addressing"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="LinkAddressState">
+    <body>
+      <values name="off"/>
+      <values name="degraded"/>
+      <values name="routable"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="LinkOnlineState">
+    <body>
+      <values name="offline"/>
+      <values name="partial"/>
+      <values name="online"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="LinkRequiredAddressFamily">
+    <body>
+      <values name="any"/>
+      <values name="ipv4"/>
+      <values name="ipv6"/>
+      <values name="both"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Address">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Address">
+        <documentation>IP address</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="AddressString">
+        <documentation>IP address (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Peer">
+        <documentation>Peer address for point-to-point interfaces</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PeerString">
+        <documentation>Peer address for point-to-point interfaces (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="PrefixLength">
+        <documentation>Network prefix length</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this address</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider (DHCP server, router, etc.)</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (DHCP server, router, etc.) (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Broadcast">
+        <documentation>Broadcast address for IPv4 networks</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="BroadcastString">
+        <documentation>Broadcast address for IPv4 networks (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Scope">
+        <documentation>Address scope (RT_SCOPE_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ScopeString">
+        <documentation>Human-readable scope string</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Flags">
+        <documentation>Address flags (IFA_F_* values)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="FlagsString">
+        <documentation>Human-readable flags string</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Label">
+        <documentation>Address label for IPv4</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="PreferredLifetimeUSec">
+        <documentation>Preferred lifetime in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="PreferredLifetimeUsec">
+        <documentation>Preferred lifetime in microseconds (deprecated, for backward compatibility)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ValidLifetimeUSec">
+        <documentation>Valid lifetime in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ValidLifetimeUsec">
+        <documentation>Valid lifetime in microseconds (deprecated, for backward compatibility)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ConfigState">
+        <documentation>Configuration state of this address</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="BitRates">
+    <body>
+      <fields name="TxBitRate">
+        <documentation>Transmit bitrate in bits per second</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="RxBitRate">
+        <documentation>Receive bitrate in bits per second</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DHCPLease">
+    <body>
+      <fields name="LeaseTimestampUSec">
+        <documentation>Timestamp when the lease was acquired in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Timeout1USec">
+        <documentation>T1 timeout (lease renewal time) in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Timeout2USec">
+        <documentation>T2 timeout (lease rebinding time) in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Hostname">
+        <documentation>Hostname received from DHCP server</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DHCPServer">
+    <body>
+      <fields name="PoolOffset">
+        <documentation>Offset from the network address for the DHCP address pool</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="PoolSize">
+        <documentation>Size of the DHCP address pool</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Leases">
+        <documentation>Active DHCP leases assigned by the server</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DHCPServerLease" definition="//@members[name='DHCPServerLease']"/>
+        </type>
+      </fields>
+      <fields name="StaticLeases">
+        <documentation>Static DHCP leases configured for specific clients</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DHCPServerLease" definition="//@members[name='DHCPServerLease']"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DHCPServerLease">
+    <body>
+      <fields name="ClientId">
+        <documentation>DHCP client identifier</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="Address">
+        <documentation>Address assigned to the client</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="AddressString">
+        <documentation>Address assigned to the client (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Hostname">
+        <documentation>Hostname provided by the DHCP client</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="HardwareAddressType">
+        <documentation>Hardware address type (ARPHRD_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="HardwareAddressLength">
+        <documentation>Length of hardware address in bytes</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="HardwareAddress">
+        <documentation>Hardware (MAC) address of the DHCP client</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ExpirationUSec">
+        <documentation>Lease expiration time in monotonic microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ExpirationRealtimeUSec">
+        <documentation>Lease expiration time in realtime microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DHCPv6Client">
+    <body>
+      <fields name="State">
+        <documentation>State of the DHCPv6 client</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DHCPv6ClientState" definition="//@members[name='DHCPv6ClientState']" nullable="true"/>
+      </fields>
+      <fields name="Lease">
+        <documentation>DHCPv6 lease information including timestamps and timeouts</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DHCPLease" definition="//@members[name='DHCPLease']" nullable="true"/>
+      </fields>
+      <fields name="Prefixes">
+        <documentation>Delegated prefixes received from DHCPv6 server</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DHCPv6ClientPD" definition="//@members[name='DHCPv6ClientPD']"/>
+        </type>
+      </fields>
+      <fields name="VendorSpecificOptions">
+        <documentation>Vendor-specific options received in DHCPv6 response</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DHCPv6ClientVendorOption" definition="//@members[name='DHCPv6ClientVendorOption']"/>
+        </type>
+      </fields>
+      <fields name="DUID">
+        <documentation>DHCP Unique Identifier (DUID) of the client</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DHCPv6ClientPD">
+    <body>
+      <fields name="Prefix">
+        <documentation>Delegated IPv6 prefix</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PrefixString">
+        <documentation>Human-readable delegated IPv6 prefix</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="PrefixLength">
+        <documentation>Length of the delegated prefix in bits</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="PreferredLifetimeUSec">
+        <documentation>Preferred lifetime of the prefix in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ValidLifetimeUSec">
+        <documentation>Valid lifetime of the prefix in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DHCPv6ClientVendorOption">
+    <body>
+      <fields name="EnterpriseId">
+        <documentation>IANA enterprise number identifying the vendor</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="SubOptionCode">
+        <documentation>Vendor-specific sub-option code</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="SubOptionData">
+        <documentation>Raw data of the vendor-specific sub-option</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DNS">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Address">
+        <documentation>DNS server IP address</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="AddressString">
+        <documentation>DNS server IP address (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Port">
+        <documentation>DNS server port number</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="InterfaceIndex">
+        <documentation>Interface index for link-local DNS servers</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ServerName">
+        <documentation>DNS server hostname for DoT/DoH</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this DNS server</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DNSSECNegativeTrustAnchor">
+    <body>
+      <fields name="DNSSECNegativeTrustAnchor">
+        <documentation>Domain name for which DNSSEC validation is disabled</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this negative trust anchor</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DNSSetting">
+    <body>
+      <fields name="LLMNR">
+        <documentation>Link-Local Multicast Name Resolution setting</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="MDNS">
+        <documentation>Multicast DNS setting</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="DNSDefaultRoute">
+        <documentation>Whether this connection can be used as a default route for DNS lookups</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="DNSOverTLS">
+        <documentation>DNS-over-TLS mode setting</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this DNS setting</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Domain">
+    <body>
+      <fields name="Domain">
+        <documentation>DNS search or route domain name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this domain</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Interface">
+    <body>
+      <fields name="Index">
+        <documentation>Network interface index</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Name">
+        <documentation>Primary interface name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="AlternativeNames">
+        <documentation>Alternative interface names</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="MasterInterfaceIndex">
+        <documentation>Interface index of the master device (for bridge/bond slaves)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Kind">
+        <documentation>Interface kind (vlan, bridge, bond, etc.)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Type">
+        <documentation>Interface type (ether, loopback, etc.)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Driver">
+        <documentation>Kernel driver name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Flags">
+        <documentation>Interface flags (IFF_* values)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="FlagsString">
+        <documentation>Human-readable interface flags</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="KernelOperationalState">
+        <documentation>Kernel operational state (IF_OPER_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="KernelOperationalStateString">
+        <documentation>Human-readable kernel operational state</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="MTU">
+        <documentation>Current MTU in bytes</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="MinimumMTU">
+        <documentation>Minimum allowed MTU in bytes</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="MaximumMTU">
+        <documentation>Maximum allowed MTU in bytes</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="HardwareAddress">
+        <documentation>Current hardware (MAC) address</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PermanentHardwareAddress">
+        <documentation>Permanent hardware (MAC) address from factory</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="BroadcastAddress">
+        <documentation>Broadcast address for Ethernet interfaces</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="IPv6LinkLocalAddress">
+        <documentation>IPv6 link-local address</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="IPv6LinkLocalAddressString">
+        <documentation>IPv6 link-local address (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="WirelessLanInterfaceType">
+        <documentation>Wireless LAN interface type (NL80211_IFTYPE_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="WirelessLanInterfaceTypeString">
+        <documentation>Human-readable wireless LAN interface type</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="SSID">
+        <documentation>Wireless network SSID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="BSSID">
+        <documentation>Wireless access point BSSID (MAC address)</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="AdministrativeState">
+        <documentation>Administrative state (configuring, configured, etc.)</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkState" definition="//@members[name='LinkState']"/>
+      </fields>
+      <fields name="ConfiguringReasons">
+        <documentation>Why the link is still in the configuring state, set only in that state</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="LinkConfiguringReason" definition="//@members[name='LinkConfiguringReason']"/>
+        </type>
+      </fields>
+      <fields name="OperationalState">
+        <documentation>Operational state (routable, degraded, etc.)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="CarrierState">
+        <documentation>Carrier state (carrier, no-carrier, etc.)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="AddressState">
+        <documentation>Address configuration state</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkAddressState" definition="//@members[name='LinkAddressState']"/>
+      </fields>
+      <fields name="IPv4AddressState">
+        <documentation>IPv4 address configuration state</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkAddressState" definition="//@members[name='LinkAddressState']"/>
+      </fields>
+      <fields name="IPv6AddressState">
+        <documentation>IPv6 address configuration state</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkAddressState" definition="//@members[name='LinkAddressState']"/>
+      </fields>
+      <fields name="OnlineState">
+        <documentation>Online state (online, offline, etc.)</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkOnlineState" definition="//@members[name='LinkOnlineState']" nullable="true"/>
+      </fields>
+      <fields name="NetworkFile">
+        <documentation>Path to .network configuration file</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="NetworkFileDropins">
+        <documentation>Paths to .network drop-in configuration files</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="RequiredForOnline">
+        <documentation>Whether this interface is required for online state</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="RequiredOperationalStateForOnline">
+        <documentation>Required operational state range for considering interface online [min, max]</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="RequiredFamilyForOnline">
+        <documentation>Required address family for considering interface online</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkRequiredAddressFamily" definition="//@members[name='LinkRequiredAddressFamily']" nullable="true"/>
+      </fields>
+      <fields name="ActivationPolicy">
+        <documentation>Activation policy (up, always-up, manual, etc.)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="NetDevFile">
+        <documentation>Path to .netdev configuration file</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="NetDevFileDropins">
+        <documentation>Paths to .netdev drop-in configuration files</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="LinkFile">
+        <documentation>Path to .link configuration file</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="LinkFileDropins">
+        <documentation>Paths to .link drop-in configuration files</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="Path">
+        <documentation>Device path in sysfs</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Vendor">
+        <documentation>Hardware vendor name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Model">
+        <documentation>Hardware model name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="DNS">
+        <documentation>DNS servers configured for this interface</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNS" definition="//@members[name='DNS']"/>
+        </type>
+      </fields>
+      <fields name="DNR">
+        <documentation>Discovery of Network-designated Resolvers (RFC9463)</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="object"/>
+        </type>
+      </fields>
+      <fields name="NTP">
+        <documentation>NTP servers configured for this interface</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="NTP" definition="//@members[name='NTP']"/>
+        </type>
+      </fields>
+      <fields name="SIP">
+        <documentation>SIP servers configured for this interface</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="SIP" definition="//@members[name='SIP']"/>
+        </type>
+      </fields>
+      <fields name="SearchDomains">
+        <documentation>DNS search domains</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Domain" definition="//@members[name='Domain']"/>
+        </type>
+      </fields>
+      <fields name="RouteDomains">
+        <documentation>DNS route-only domains</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Domain" definition="//@members[name='Domain']"/>
+        </type>
+      </fields>
+      <fields name="DNSSECNegativeTrustAnchors">
+        <documentation>DNSSEC negative trust anchors</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSSECNegativeTrustAnchor" definition="//@members[name='DNSSECNegativeTrustAnchor']"/>
+        </type>
+      </fields>
+      <fields name="DNSSettings">
+        <documentation>DNS resolution settings (LLMNR, mDNS, etc.)</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSSetting" definition="//@members[name='DNSSetting']"/>
+        </type>
+      </fields>
+      <fields name="CaptivePortal">
+        <documentation>Captive portal detection URL (RFC8910)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="NDisc">
+        <documentation>IPv6 Neighbor Discovery information</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="NDisc" definition="//@members[name='NDisc']" nullable="true"/>
+      </fields>
+      <fields name="Addresses">
+        <documentation>IP addresses configured on this interface</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Address" definition="//@members[name='Address']"/>
+        </type>
+      </fields>
+      <fields name="Neighbors">
+        <documentation>Neighbor entries (ARP/NDP cache)</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Neighbor" definition="//@members[name='Neighbor']"/>
+        </type>
+      </fields>
+      <fields name="NextHops">
+        <documentation>Next hops for multipath routing</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="NextHop" definition="//@members[name='NextHop']"/>
+        </type>
+      </fields>
+      <fields name="Routes">
+        <documentation>Routes configured on this interface</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Route" definition="//@members[name='Route']"/>
+        </type>
+      </fields>
+      <fields name="DHCPServer">
+        <documentation>DHCP server configuration and leases</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DHCPServer" definition="//@members[name='DHCPServer']" nullable="true"/>
+      </fields>
+      <fields name="DHCPv4Client">
+        <documentation>DHCPv4 client configuration and lease information</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="object" nullable="true"/>
+      </fields>
+      <fields name="DHCPv6Client">
+        <documentation>DHCPv6 client configuration and lease information</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DHCPv6Client" definition="//@members[name='DHCPv6Client']" nullable="true"/>
+      </fields>
+      <fields name="LLDP">
+        <documentation>LLDP transmit configuration for this interface</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LLDPNeighbor" definition="//@members[name='LLDPNeighbor']" nullable="true"/>
+      </fields>
+      <fields name="BitRates">
+        <documentation>Current transmit/receive bitrates from speed meter</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BitRates" definition="//@members[name='BitRates']" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="LLDPNeighbor">
+    <body>
+      <fields name="ChassisID">
+        <documentation>Chassis identifier in human-readable format</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="RawChassisID">
+        <documentation>Raw chassis identifier bytes</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PortID">
+        <documentation>Port identifier in human-readable format</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="RawPortID">
+        <documentation>Raw port identifier bytes</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PortDescription">
+        <documentation>Description of the port</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="SystemName">
+        <documentation>System name of the LLDP neighbor</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="SystemDescription">
+        <documentation>System description of the LLDP neighbor</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="EnabledCapabilities">
+        <documentation>Enabled capabilities bitmap (bridge, router, WLAN, etc.)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="MUDURL">
+        <documentation>Manufacturer Usage Description URL (RFC8520)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="VlanID">
+        <documentation>VLAN identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="LLDPNeighborsByInterface">
+    <body>
+      <fields name="InterfaceIndex">
+        <documentation>Network interface index</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="InterfaceName">
+        <documentation>Primary interface name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="InterfaceAlternativeNames">
+        <documentation>Alternative interface names</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="Neighbors">
+        <documentation>LLDP neighbors discovered on this interface</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="LLDPNeighbor" definition="//@members[name='LLDPNeighbor']"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="NDisc">
+    <body>
+      <fields name="PREF64">
+        <documentation>PREF64 (RFC8781) prefixes advertised via IPv6 Router Advertisements</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Pref64" definition="//@members[name='Pref64']"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Neighbor">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Destination">
+        <documentation>IP address of the neighbor</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="DestinationString">
+        <documentation>IP address of the neighbor (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="LinkLayerAddress">
+        <documentation>Link layer (MAC) address of the neighbor</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this neighbor entry</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigState">
+        <documentation>Configuration state of this neighbor entry</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="NextHop">
+    <body>
+      <fields name="ID">
+        <documentation>Next hop identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Gateway">
+        <documentation>Gateway address for this next hop</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="GatewayString">
+        <documentation>Gateway address for this next hop (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Flags">
+        <documentation>Next hop flags (RTNH_F_* values)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="FlagsString">
+        <documentation>Human-readable flags string</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Protocol">
+        <documentation>Routing protocol identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ProtocolString">
+        <documentation>Human-readable routing protocol name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Blackhole">
+        <documentation>Whether this is a blackhole next hop (drops packets)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="Group">
+        <documentation>Multipath group members with weights for load balancing</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="NextHopGroup" definition="//@members[name='NextHopGroup']"/>
+        </type>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this next hop</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigState">
+        <documentation>Configuration state of this next hop</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="NextHopGroup">
+    <body>
+      <fields name="ID">
+        <documentation>Next hop identifier in the multipath group</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Weight">
+        <documentation>Weight for load balancing (higher means more traffic)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="NTP">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6) for address-based servers</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Address">
+        <documentation>NTP server IP address</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="AddressString">
+        <documentation>NTP server IP address (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Server">
+        <documentation>NTP server</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this NTP server</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Pref64">
+    <body>
+      <fields name="Prefix">
+        <documentation>IPv6 prefix for NAT64/DNS64</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PrefixString">
+        <documentation>Human-readable IPv6 prefix</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="PrefixLength">
+        <documentation>Length of the prefix in bits</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="LifetimeUSec">
+        <documentation>Lifetime of the prefix in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of router that provided this prefix</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of router that provided this prefix (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="PrivateOption">
+    <body>
+      <fields name="Option">
+        <documentation>DHCP option number</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="PrivateOptionData">
+        <documentation>Raw data of the private DHCP option</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Route">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Destination">
+        <documentation>Destination network address</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="DestinationString">
+        <documentation>Destination network address (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="DestinationPrefixLength">
+        <documentation>Destination network prefix length</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Gateway">
+        <documentation>Gateway address for this route</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="GatewayString">
+        <documentation>Gateway address for this route (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Source">
+        <documentation>Source address prefix for route selection</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="SourceString">
+        <documentation>Source address prefix for route selection (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="SourcePrefixLength">
+        <documentation>Source prefix length</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="PreferredSource">
+        <documentation>Preferred source address for outgoing packets</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="PreferredSourceString">
+        <documentation>Preferred source address for outgoing packets (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="TOS">
+        <documentation>Type of Service (TOS) field</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Scope">
+        <documentation>Route scope (RT_SCOPE_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ScopeString">
+        <documentation>Human-readable scope string</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Protocol">
+        <documentation>Routing protocol identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ProtocolString">
+        <documentation>Human-readable routing protocol name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Type">
+        <documentation>Route type (RTN_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="TypeString">
+        <documentation>Human-readable route type</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Priority">
+        <documentation>Route priority/metric</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Table">
+        <documentation>Routing table number</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="TableString">
+        <documentation>Human-readable routing table name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Flags">
+        <documentation>Route flags (RTM_F_* values)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="FlagsString">
+        <documentation>Human-readable flags string</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="NextHopID">
+        <documentation>Next hop ID for multipath routing</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="MTU">
+        <documentation>Maximum Transmission Unit for this route</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Preference">
+        <documentation>Route preference for IPv6 (low/medium/high)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="LifetimeUSec">
+        <documentation>Route lifetime in microseconds</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this route</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigState">
+        <documentation>Configuration state of this route</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="InterfaceIndex">
+        <documentation>Interface index for serialization</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Metrics">
+        <documentation>Route metrics (RTAX_* values)</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="TCPCongestionControlAlgorithm">
+        <documentation>TCP congestion control algorithm for this route</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="RoutingPolicyRule">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="FromPrefix">
+        <documentation>Source address prefix to match</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="FromPrefixString">
+        <documentation>Source address prefix to match (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="FromPrefixLength">
+        <documentation>Length of source prefix in bits</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ToPrefix">
+        <documentation>Destination address prefix to match</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ToPrefixString">
+        <documentation>Destination address prefix to match (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ToPrefixLength">
+        <documentation>Length of destination prefix in bits</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Protocol">
+        <documentation>Routing protocol identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ProtocolString">
+        <documentation>Human-readable routing protocol name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="TOS">
+        <documentation>Type of Service (TOS) field to match</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Type">
+        <documentation>Rule action type (FR_ACT_* value)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="TypeString">
+        <documentation>Human-readable rule action type</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="IPProtocol">
+        <documentation>IP protocol number to match</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="IPProtocolString">
+        <documentation>Human-readable IP protocol name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Priority">
+        <documentation>Rule priority (lower value means higher priority)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="FirewallMark">
+        <documentation>Firewall mark value to match</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="FirewallMask">
+        <documentation>Firewall mark mask to apply</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Table">
+        <documentation>Routing table number to use</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="TableString">
+        <documentation>Human-readable routing table name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Invert">
+        <documentation>Whether rule matching is inverted</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="SuppressPrefixLength">
+        <documentation>Suppress route lookup if prefix length is less than or equal to this value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="SuppressInterfaceGroup">
+        <documentation>Suppress route lookup if interface group matches</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="SourcePort">
+        <documentation>Source port range to match [start, end]</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="DestinationPort">
+        <documentation>Destination port range to match [start, end]</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="User">
+        <documentation>User ID range to match [start, end]</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="IncomingInterface">
+        <documentation>Incoming interface name to match</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="OutgoingInterface">
+        <documentation>Outgoing interface name to match</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this rule</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigState">
+        <documentation>Configuration state of this rule</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="SIP">
+    <body>
+      <fields name="Family">
+        <documentation>Address family (AF_INET or AF_INET6) for address-based servers</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Address">
+        <documentation>SIP server IP address</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="AddressString">
+        <documentation>SIP server IP address (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Domain">
+        <documentation>SIP server domain name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ConfigSource">
+        <documentation>Configuration source for this SIP server</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfigProvider">
+        <documentation>Address of the configuration provider</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="ConfigProviderString">
+        <documentation>Address of the configuration provider (human-readable format)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Describe">
+    <input/>
+    <output>
+      <fields name="Interfaces">
+        <documentation>All network interfaces managed by systemd-networkd</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Interface" definition="//@members[name='Interface']"/>
+        </type>
+      </fields>
+      <fields name="NextHops">
+        <documentation>All configured next hops for multipath routing</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="NextHop" definition="//@members[name='NextHop']"/>
+        </type>
+      </fields>
+      <fields name="Routes">
+        <documentation>All configured routes across all interfaces</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Route" definition="//@members[name='Route']"/>
+        </type>
+      </fields>
+      <fields name="RoutingPolicyRules">
+        <documentation>All configured routing policy rules</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="RoutingPolicyRule" definition="//@members[name='RoutingPolicyRule']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetStates">
+    <input/>
+    <output>
+      <fields name="AddressState">
+        <documentation>Overall address configuration state across all interfaces</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkAddressState" definition="//@members[name='LinkAddressState']"/>
+      </fields>
+      <fields name="IPv4AddressState">
+        <documentation>IPv4 address configuration state across all interfaces</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkAddressState" definition="//@members[name='LinkAddressState']"/>
+      </fields>
+      <fields name="IPv6AddressState">
+        <documentation>IPv6 address configuration state across all interfaces</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkAddressState" definition="//@members[name='LinkAddressState']"/>
+      </fields>
+      <fields name="CarrierState">
+        <documentation>Carrier state across all interfaces</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="OnlineState">
+        <documentation>Online state across all interfaces</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LinkOnlineState" definition="//@members[name='LinkOnlineState']" nullable="true"/>
+      </fields>
+      <fields name="OperationalState">
+        <documentation>Operational state across all interfaces</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetNamespaceId">
+    <input/>
+    <output>
+      <fields name="NamespaceId">
+        <documentation>Network namespace inode number</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="NamespaceNSID">
+        <documentation>Network namespace ID (cookie) assigned by the kernel</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetLLDPNeighbors">
+    <input>
+      <fields name="InterfaceIndex">
+        <documentation>Filter by interface index (optional)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="InterfaceName">
+        <documentation>Filter by interface name (optional)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="Neighbors">
+        <documentation>LLDP neighbors grouped by interface</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="LLDPNeighborsByInterface" definition="//@members[name='LLDPNeighborsByInterface']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Reload">
+    <input>
+      <fields name="reconfigureLinks">
+        <documentation>If true (default), reload config files and reconfigure all matching network interfaces. If false, only reload config files without reconfiguring interfaces; use 'networkctl reconfigure' afterwards to apply changes selectively.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetPersistentStorage">
+    <input>
+      <fields name="Ready">
+        <documentation>Whether persistent storage is ready and writable</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="AlreadyReloading">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="StorageReadOnly">
+    <parameters/>
+  </members>
+</varlink:Interface>

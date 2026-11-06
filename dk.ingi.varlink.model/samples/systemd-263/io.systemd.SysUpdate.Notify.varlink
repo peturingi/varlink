@@ -1,0 +1,13 @@
+# [Experimental]
+interface io.systemd.SysUpdate.Notify
+
+type Resource(
+	transfer: string,
+	path: ?string
+)
+
+method OnCompletedUpdate(
+	component: ?string,
+	version: ?string,
+	resources: ?[]Resource
+) -> ()

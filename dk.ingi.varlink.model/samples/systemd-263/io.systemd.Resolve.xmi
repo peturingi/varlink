@@ -1,0 +1,819 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Resolve">
+  <members xsi:type="varlink:EnumDefinition" name="DNSProtocol">
+    <documentation>The type of protocol.</documentation>
+    <body>
+      <values name="dns">
+        <documentation>DNS</documentation>
+      </values>
+      <values name="mdns">
+        <documentation>Multicast DNS</documentation>
+      </values>
+      <values name="llmnr">
+        <documentation>LLMNR</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="DNSOverTLSMode">
+    <documentation>The mode of DNSOverTLS.</documentation>
+    <body>
+      <values name="no">
+        <documentation>DNSOverTLS is disabled.</documentation>
+      </values>
+      <values name="yes">
+        <documentation>DNSOverTLS is enabled.</documentation>
+      </values>
+      <values name="opportunistic">
+        <documentation>Try to use DNSOverTLS, but disabled when the server does not support it.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ResolveSupport">
+    <documentation>Whether the protocol is enabled.</documentation>
+    <body>
+      <values name="no">
+        <documentation>The protocol is disabled.</documentation>
+      </values>
+      <values name="yes">
+        <documentation>The protocol is enabled.</documentation>
+      </values>
+      <values name="resolve">
+        <documentation>The protocol is used only for resolving.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ResolvConfMode">
+    <documentation>The management mode of /etc/resolve.conf file.</documentation>
+    <body>
+      <values name="uplink">
+        <documentation>/etc/resolv.conf is a symbolic link to /run/systemd/resolve/resolv.conf.</documentation>
+      </values>
+      <values name="stub">
+        <documentation>/etc/resolv.conf is a symbolic link to /run/systemd/resolve/stub-resolv.conf.</documentation>
+      </values>
+      <values name="static">
+        <documentation>/etc/resolv.conf is a symbolic link to /usr/lib/systemd/resolv.conf.</documentation>
+      </values>
+      <values name="missing">
+        <documentation>/etc/resolv.conf does not exist.</documentation>
+      </values>
+      <values name="foreign">
+        <documentation>/etc/resolv.conf is not managed by systemd-resolved.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="BrowseServiceUpdateFlag">
+    <documentation>Describes the update flag for browsing services, indicating whether a service was added or removed during browsing.</documentation>
+    <body>
+      <values name="added">
+        <documentation>Indicates that the service was added.</documentation>
+      </values>
+      <values name="removed">
+        <documentation>Indicates that the service was removed.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResolvedAddress">
+    <documentation>Encapsulates a resolved address.</documentation>
+    <body>
+      <fields name="ifindex">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="family">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="address">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResolvedName">
+    <documentation>Encapsulates a resolved host name.</documentation>
+    <body>
+      <fields name="ifindex">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResolvedService">
+    <documentation>Encapsulates resolved service information.</documentation>
+    <body>
+      <fields name="priority">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="weight">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="port">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="hostname">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="canonicalName">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="addresses">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ResolvedAddress" definition="//@members[name='ResolvedAddress']"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResolvedCanonical">
+    <documentation>Encapsulates the canonical name, type and domain of a DNS-SD or simple SRV service. Note that due to CNAME redirections and similar, a named DNS-SD service might resolve to a canonical service that is an unnamed simple SRV service. Or in other words: resolving a named service might return an unnamed canonical service.</documentation>
+    <body>
+      <fields name="name">
+        <documentation>The DNS-SD name of the service. For simple SRV services this field is absent or null.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="domain">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResourceKey">
+    <documentation>The 'key' part of a DNS resource record.</documentation>
+    <body>
+      <fields name="class">
+        <documentation>The RR class, almost always IN, i.e 0x01. If unspecified defaults to IN.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <documentation>The RR types, one of A, AAAA, PTR, …</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="name">
+        <documentation>The domain name.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResourceRecord">
+    <documentation>A full DNS resource record..</documentation>
+    <body>
+      <fields name="key">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceKey" definition="//@members[name='ResourceKey']"/>
+      </fields>
+      <fields name="priority">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="weight">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="port">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="cpu">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="os">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="items">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="address">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="mname">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="rname">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="serial">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="refresh">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="retry">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="expire">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="minimum">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="exchange">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="version">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="size">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="horiz_pre">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="vert_pre">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="latitude">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="longitude">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="altitude">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="keyTag">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="algorithm">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="digestType">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="digest">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fptype">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="fingerprint">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="protocol">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="dnskey">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="signer">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="typeCovered">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="labels">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="originalTtl">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="expiration">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="inception">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="signature">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="nextDomain">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="types">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="iterations">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="salt">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="hash">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="certUsage">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="selector">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="matchingType">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="data">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="tag">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="value">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="target">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="svcparams">
+        <type xsi:type="varlink:BuiltinType" kind="object" nullable="true"/>
+      </fields>
+      <fields name="order">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="preference">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="naptrFlags">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="services">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="regexp">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="replacement">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResolvedRecord">
+    <documentation>Encapsulates information about a resolved DNS resource record </documentation>
+    <body>
+      <fields name="ifindex">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="rr">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceRecord" definition="//@members[name='ResourceRecord']" nullable="true"/>
+      </fields>
+      <fields name="raw">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ServiceData">
+    <documentation>Encapsulates the service data obtained from browsing.</documentation>
+    <body>
+      <fields name="updateFlag">
+        <type xsi:type="varlink:NamedTypeReference" typeName="BrowseServiceUpdateFlag" definition="//@members[name='BrowseServiceUpdateFlag']"/>
+      </fields>
+      <fields name="family">
+        <documentation>The address family of the service, one of AF_INET or AF_INET6.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="name">
+        <documentation>The name of the service, e.g., 'My Service'. May be null if not specified.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <documentation>The type of service, e.g., '_http._tcp'.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="domain">
+        <documentation>The domain in which the service resides, e.g., 'local'.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>The Linux interface index for the network interface associated with this service.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DNSServer">
+    <documentation>Encapsulates a DNS server address specification.</documentation>
+    <body>
+      <fields name="address">
+        <documentation>IPv4 or IPv6 address of the server.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="addressString">
+        <documentation>IPv4 or IPv6 address of the server, formatted as a human-readable string.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="family">
+        <documentation>Address family of the server, one of AF_INET or AF_INET6.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="port">
+        <documentation>Port number of the server.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>Interface index for which this server is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <documentation>Server Name Indication (SNI) of the server.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="accessible">
+        <documentation>Indicates if the DNS server is accessible or not.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="SearchDomain">
+    <documentation>Encapsulates a search domain specification.</documentation>
+    <body>
+      <fields name="name">
+        <documentation>Domain name.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="routeOnly">
+        <documentation>Indicates whether or not this is a routing-only domain.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>Interface index for which this search domain is configured.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DNSConfiguration">
+    <documentation>Encapsulates a global or per-link DNS configuration, including configured DNS servers, search domains, and more.</documentation>
+    <body>
+      <fields name="ifname">
+        <documentation>Interface name, if any, associated with this configuration. Empty for global configuration.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>Interface index, if any, associated with this configuration. Empty for global configuration.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="delegate">
+        <documentation>Delegate name, if any, associated with this configuration. Empty for global or link configurations.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="defaultRoute">
+        <documentation>Indicates whether or not this link's DNS servers will be used for resolving domain names that do not match any link's configured domains.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="currentServer">
+        <documentation>DNS server currently selected to use for lookups.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DNSServer" definition="//@members[name='DNSServer']" nullable="true"/>
+      </fields>
+      <fields name="servers">
+        <documentation>Array of configured DNS servers.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSServer" definition="//@members[name='DNSServer']"/>
+        </type>
+      </fields>
+      <fields name="fallbackServers">
+        <documentation>Array of configured fallback DNS servers, set for global configuration only.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSServer" definition="//@members[name='DNSServer']"/>
+        </type>
+      </fields>
+      <fields name="searchDomains">
+        <documentation>Array of configured search domains.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="SearchDomain" definition="//@members[name='SearchDomain']"/>
+        </type>
+      </fields>
+      <fields name="negativeTrustAnchors">
+        <documentation>Array of configured DNSSEC negative trust anchors.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="dnssec">
+        <documentation>DNSSEC mode.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="dnssecSupported">
+        <documentation>Indicates if the current DNS server supports DNSSEC. Always false if DNSSEC mode is "no".</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="dnsOverTLS">
+        <documentation>DNSOverTLS mode.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DNSOverTLSMode" definition="//@members[name='DNSOverTLSMode']" nullable="true"/>
+      </fields>
+      <fields name="llmnr">
+        <documentation>LLMNR support.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="mDNS">
+        <documentation>mDNS support.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResolveSupport" definition="//@members[name='ResolveSupport']" nullable="true"/>
+      </fields>
+      <fields name="resolvConfMode">
+        <documentation>resolv.conf mode, set for global configuration only.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResolvConfMode" definition="//@members[name='ResolvConfMode']" nullable="true"/>
+      </fields>
+      <fields name="scopes">
+        <documentation>Array of current DNS scopes.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSScope" definition="//@members[name='DNSScope']"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="DNSScope">
+    <documentation>Encapsulates a DNS scope specification.</documentation>
+    <body>
+      <fields name="protocol">
+        <documentation>Protocol associated with this scope.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DNSProtocol" definition="//@members[name='DNSProtocol']"/>
+      </fields>
+      <fields name="family">
+        <documentation>Address family associated with this scope.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>Interface index associated with this scope.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ifname">
+        <documentation>Interface name associated with this scope.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="dnssec">
+        <documentation>DNSSEC mode associated with this scope.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="dnsOverTLS">
+        <documentation>DNSOverTLS mode associated with this scope.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DNSOverTLSMode" definition="//@members[name='DNSOverTLSMode']" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="ResolveHostname">
+    <documentation>Resolves a hostname to one or more IP addresses.</documentation>
+    <input>
+      <fields name="ifindex">
+        <documentation>The Linux interface index for the network interface to search on. Typically left unspecified, in order to search on all interfaces.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <documentation>The host name to resolve.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="family">
+        <documentation>The address family to search for, one of AF_INET or AF_INET6.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="flags">
+        <documentation>Various search flags.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="addresses">
+        <documentation>Array of resolved IP addresses</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ResolvedAddress" definition="//@members[name='ResolvedAddress']"/>
+        </type>
+      </fields>
+      <fields name="name">
+        <documentation>Canonical name of the host.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="flags">
+        <documentation>Various flags indicating details on discovered data.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ResolveAddress">
+    <documentation>Resolves an IP address to a hostname.</documentation>
+    <input>
+      <fields name="ifindex">
+        <documentation>The Linux interface index for the network interface to search on. Typically left unspecified, in order to search on all interfaces.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="family">
+        <documentation>The address family of the specified address, one of AF_INET or AF_INET6.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="address">
+        <documentation>The IP address to look up, either 4 or 16 integers (depending if an AF_INET or AF_INET6 address shall be resolved).</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="names">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ResolvedName" definition="//@members[name='ResolvedName']"/>
+        </type>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ResolveService">
+    <documentation>Resolves a named DNS-SD or unnamed simple SRV service.</documentation>
+    <input>
+      <fields name="name">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="domain">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ifindex">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="family">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="services">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ResolvedService" definition="//@members[name='ResolvedService']"/>
+        </type>
+      </fields>
+      <fields name="txt">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="canonical">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResolvedCanonical" definition="//@members[name='ResolvedCanonical']"/>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ResolveRecord">
+    <documentation>Resolves a domain name to one or more DNS resource records.</documentation>
+    <input>
+      <fields name="ifindex">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="class">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="rrs">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ResolvedRecord" definition="//@members[name='ResolvedRecord']"/>
+        </type>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="BrowseServices" moreSupport="required">
+    <documentation>Starts browsing for DNS-SD services of specified type.</documentation>
+    <input>
+      <fields name="domain">
+        <documentation>The domain to browse for services. If null, the default browsing domain local is used.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <documentation>The service type to browse for (e.g., '_http._tcp').</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ifindex">
+        <documentation>The Linux interface index for the network interface to search on.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="flags">
+        <documentation>Various browsing flags to modify the operation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="browserServiceData">
+        <documentation>An array of service data containing information about discovered services.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ServiceData" definition="//@members[name='ServiceData']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="DumpDNSConfiguration">
+    <documentation>Current global and per-link DNS configurations.</documentation>
+    <input/>
+    <output>
+      <fields name="configuration">
+        <documentation>The current global and per-interface DNS configurations</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="DNSConfiguration" definition="//@members[name='DNSConfiguration']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoNameServers">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchResourceRecord">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="QueryTimedOut">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="MaxAttemptsReached">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InvalidReply">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="QueryAborted">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="QueryRefused">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="DNSSECValidationFailed">
+    <parameters>
+      <fields name="result">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="extendedDNSErrorCode">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="extendedDNSErrorMessage">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoTrustAnchor">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ResourceRecordTypeUnsupported">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NetworkDown">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSource">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="StubLoop">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="DNSError">
+    <parameters>
+      <fields name="rcode">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="queryString">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="extendedDNSErrorCode">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="extendedDNSErrorMessage">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="CNAMELoop">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="BadAddressSize">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ResourceRecordTypeInvalidForQuery">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ZoneTransfersNotPermitted">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ResourceRecordTypeObsolete">
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InconsistentServiceRecords">
+    <documentation>The DNS resource records of the specified service are not consistent (e.g. lacks a DNS-SD service type when resolved).</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ServiceNotProvided">
+    <documentation>The service is explicitly not provided on the queried domain (RFC 2782 root domain SRV record).</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

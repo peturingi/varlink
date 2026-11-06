@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.JournalAccess">
+  <documentation>Journal log read APIs</documentation>
+  <members xsi:type="varlink:Method" name="GetEntries" moreSupport="required">
+    <documentation>Retrieve journal log entries, optionally filtered by unit, priority, etc.</documentation>
+    <input>
+      <fields name="units">
+        <documentation>Show messages for the specified systemd units (e.g. ['foo.service']).</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="uid">
+        <documentation>UID to match user units for</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="userUnits">
+        <documentation>Show messages for the specified user units (e.g. ['foo.service']).</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="namespace">
+        <documentation>If specified, shows the log data of the specified namespace, otherwise the default namespace.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="priority">
+        <documentation>Filter output by message priorities or priority ranges (i.e. between 0/'emerg' and 7/'debug')</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="limit">
+        <documentation>Maximum number of entries to return. Defaults to 100, capped at 10000.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="follow">
+        <documentation>If true, do not complete after sending the newest entries: keep the call open and stream new entries as they are logged, until the client disconnects. The limit parameter then bounds only the initial backlog.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="entry">
+        <documentation>The journal entry in flat JSON format, matching journalctl --output=json.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="object"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoMatches">
+    <documentation>No matches found for specified unit patterns</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoEntries">
+    <documentation>No journal entries matched the specified filters.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

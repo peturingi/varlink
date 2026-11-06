@@ -1,0 +1,262 @@
+# An API for acquiring a pseudo-terminal
+interface io.systemd.PTYBroker
+
+# What to do with the PTY frontend.
+type FrontendType(
+	# Return the file descriptor of the frontend side of the pty to the caller, do not keep a duplicate.
+	take,
+	# Read any data received from the backend and send it to monitors, afterwards discard it
+	null,
+	# Read any data received from the backend and write it to monitors and the logs
+	log
+)
+
+# What to do with the PTY backend.
+type BackendType(
+	# Return the file descriptor of the backend side of the pty to the caller, do not keep a duplicate.
+	take,
+	# Invoke a shell on the backend side.
+	shell
+)
+
+# Details about terminal settings.
+type TerminalSettings(
+	# Terminal type ($TERM)
+	envTERM: ?string,
+	# Terminal type ($COLORTERM)
+	envCOLORTERM: ?string,
+	# Whether $NO_COLOR is set to a non-empty value, i.e. color output shall be suppressed (see no-color.org)
+	envNO_COLOR: ?bool,
+	# Width (in character cell columns) for the pty
+	columns: ?int,
+	# Height (in character cell lines) for the pty
+	lines: ?int
+)
+
+# The working directory of the shell.
+type WorkingDirectory(
+	# The path to the working directory. Mutually exclusive with 'home'
+	path: ?string,
+	# If true, use the configured user's home directory as the working directory. Mutually exclusive with 'path'
+	home: ?bool,
+	# Whether the path to the working directory is allowed to not exist
+	missingOK: ?bool
+)
+
+# An object for referencing UNIX processes
+type ProcessId(
+	# Numeric UNIX PID value
+	pid: int,
+	# 64bit inode number of pidfd if known
+	pidfdId: ?int,
+	# Boot ID of the system the inode number belongs to
+	bootId: ?string
+)
+
+# Allocates a PTY pair, and configures what to do with each side.
+# [Supports 'upgrade' flag]
+method AcquirePty(
+	# What to do with the 'frontend' of the pty, also known as the pty 'master'
+	frontendType: FrontendType,
+	# What to do with the 'backend' of the pty, also known the pty 'slave'
+	backendType: BackendType,
+	# A unique name to identify the pty allocation with
+	name: ?string,
+	# A descriptive string to identify the pty allocation with (doesn't have to be unique)
+	description: ?string,
+	# The syslog 'tag' to use for this pseudo TTY output when connected to logging
+	tag: ?string,
+	# For shell backend: user to run the shell as
+	user: ?string,
+	# For shell backend: group to run the shell as
+	group: ?string,
+	# For shell backend: initial directory for the shell, either an absolute path or the home directory of the user
+	workingDirectory: ?WorkingDirectory,
+	# For shell backend: environment variables for the shell, as a list of assignments in the usual VAR=VALUE syntax
+	environment: ?[]string,
+	# For shell backend: whether to allocate a 'lightweight' session
+	lightweight: ?bool,
+	# For shell backend: command line to invoke as main service process. If unset an interactive login shell is invoked.
+	commandLine: ?[]string,
+	# For shell backend: whether to invoke the command line via the target user's native shell. Defaults to true. If false a command line must be specified, and is invoked directly.
+	viaShell: ?bool,
+	# For shell backend: absolute path of the binary to execute. Only valid if viaShell is false. If unset the first element of the command line is used, otherwise the first element of the command line is only passed as argv[0] (e.g. to request login shell semantics by prefixing it with a dash).
+	executable: ?string,
+	# Convert the connection into a monitor connection once done
+	monitor: ?bool,
+	# If true, hang up the pty once this monitor connection is disconnected. If null defaults to false.
+	hangUpOnDisconnect: ?bool,
+	# If true, a hangup of the backend side of the pty (e.g. because the last process having it open closed it, or called vhangup() on it) does not release the pty, since the backend might be reopened later. Only valid in combination with the monitor and hangUpOnDisconnect flags, as the monitor connection going away then defines the lifetime of the pty. If null defaults to false.
+	ignoreHangup: ?bool,
+	# If true, track the dimensions of the monitor's terminal via OSC 2811 sequences on the monitor stream, and propagate the minimum dimensions of all monitors to the pty. Only valid in combination with the monitor flag. If null defaults to false.
+	osc2811: ?bool,
+	# Initial settings for the terminal
+	terminalSettings: ?TerminalSettings,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# Selected name for the pty allocation
+	name: string,
+	# A descriptive string to identify the pty allocation with (doesn't have to be unique)
+	description: ?string,
+	# The frontend type for this PTY
+	frontendType: FrontendType,
+	# The backend type for this PTY
+	backendType: BackendType,
+	# The syslog 'tag' to use for this pseudo TTY output when connected to logging
+	tag: ?string,
+	# The index of the PTY frontend (i.e. 'master')
+	frontendFileDescriptor: ?int,
+	# The index of the PTY backend (i.e. 'slave')
+	backendFileDescriptor: ?int,
+	# The TTY path name of the allocate pseudo TTY
+	backendPath: string,
+	# The name of the transient service unit that runs the shell or login on the PTY backend side.
+	unit: ?string,
+	# Settled settings for the terminal
+	terminalSettings: ?TerminalSettings
+)
+
+# Enrolls a pre-allocated PTY frontend (i.e. the master).
+# [Supports 'upgrade' flag]
+method EnrollPty(
+	# The index of the PTY frontend (i.e. 'master')
+	frontendFileDescriptor: int,
+	# What to do with the 'frontend' of the pty, also known as the pty 'master'
+	frontendType: FrontendType,
+	# The TTY path name of the pre-allocated pseudo TTY, if known and meaningful to the broker. Leave unset if the path only makes sense within the caller's namespace.
+	backendPath: ?string,
+	# A unique name to identify the pty allocation with
+	name: ?string,
+	# A descriptive string to identify the pty allocation with (doesn't have to be unique)
+	description: ?string,
+	# The syslog 'tag' to use for this pseudo TTY output when connected to logging
+	tag: ?string,
+	# Convert the connection into a monitor connection once done
+	monitor: ?bool,
+	# If true, hang up the pty once this monitor connection is disconnected. If null defaults to false.
+	hangUpOnDisconnect: ?bool,
+	# If true, a hangup of the backend side of the pty (e.g. because the last process having it open closed it, or called vhangup() on it) does not release the pty, since the backend might be reopened later. Only valid in combination with the monitor and hangUpOnDisconnect flags, as the monitor connection going away then defines the lifetime of the pty. If null defaults to false.
+	ignoreHangup: ?bool,
+	# If true, track the dimensions of the monitor's terminal via OSC 2811 sequences on the monitor stream, and propagate the minimum dimensions of all monitors to the pty. Only valid in combination with the monitor flag. If null defaults to false.
+	osc2811: ?bool,
+	# Initial settings for the terminal
+	terminalSettings: ?TerminalSettings,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# Selected name for the pty allocation
+	name: string,
+	# A descriptive string to identify the pty allocation with (doesn't have to be unique)
+	description: ?string,
+	# The frontend type for this PTY
+	frontendType: FrontendType,
+	# The backend type for this PTY
+	backendType: BackendType,
+	# The syslog 'tag' to use for this pseudo TTY output when connected to logging
+	tag: ?string,
+	# Settled settings for the terminal
+	terminalSettings: ?TerminalSettings
+)
+
+# Monitor frontend side of the pty.
+# [Requires 'upgrade' flag]
+method MonitorPty(
+	# The name of the PTY allocation to connect to.
+	name: string,
+	# How many lines of track buffer to return. If null defaults to 0.
+	trackBufferLines: ?int,
+	# If true, hang up the pty once this monitor connection is disconnected. If null defaults to false.
+	hangUpOnDisconnect: ?bool,
+	# If true, track the dimensions of the monitor's terminal via OSC 2811 sequences on the monitor stream, and propagate the minimum dimensions of all monitors to the pty. If null defaults to false.
+	osc2811: ?bool,
+	# New settings for the terminal (not that the environment based settings will not be propagated to the backend processes)
+	terminalSettings: ?TerminalSettings,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# Name of the allocated PTY
+	name: string,
+	# A descriptive string to identify the pty allocation with (doesn't have to be unique)
+	description: ?string,
+	# The frontend type for this PTY
+	frontendType: FrontendType,
+	# The backend type for this PTY
+	backendType: BackendType,
+	# The syslog 'tag' to use for this pseudo TTY output when connected to logging
+	tag: ?string,
+	# The TTY path name of the allocate pseudo TTY
+	backendPath: ?string,
+	# The unit backing the PTY if known
+	unit: ?string,
+	# Current contents of the track buffer, line by line.
+	trackBuffer: ?[]string,
+	# Settings for the terminal
+	terminalSettings: ?TerminalSettings
+)
+
+# Reconfigure pseudo terminal
+method ConfigurePty(
+	# The name of the PTY allocation to reconfigure to.
+	name: string,
+	# New settings for the terminal (not that the environment based settings will not be propagated to the backend processes)
+	terminalSettings: ?TerminalSettings,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# Complete configured settings
+	terminalSettings: ?TerminalSettings
+)
+
+# List allocated pseudo-terminals
+# [Supports 'more' flag]
+method ListPty(
+	# The name of the PTY allocation to list.
+	name: ?string,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# Name of the allocated PTY
+	name: string,
+	# A descriptive string to identify the pty allocation with (doesn't have to be unique)
+	description: ?string,
+	# The frontend type for this PTY
+	frontendType: FrontendType,
+	# The backend type for this PTY
+	backendType: BackendType,
+	# The syslog 'tag' to use for this pseudo TTY output when connected to logging
+	tag: ?string,
+	# The backend path for this PTY
+	backendPath: ?string,
+	# The unit backing the PTY if known
+	unit: ?string,
+	# The process of the client that allocated this PTY
+	owner: ?ProcessId,
+	# The UID of the client that allocated this PTY
+	ownerUID: ?int,
+	# The GID of the client that allocated this PTY
+	ownerGID: ?int
+)
+
+# Hang up pseudo terminal
+method HangUpPty(
+	# Name of the allocated PTY to hang up
+	name: string,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> ()
+
+# No PTY by the given name known
+error NoSuchPty()
+
+# A PTY by the given name already exists.
+error PtyExists()
+
+# Limit on number of PTYs reached.
+error TooManyPtys()
+
+# Limit on number of monitors of a PTY reached.
+error TooManyMonitors()
+
+# Tracking of PTY state not enabled for specified PTY.
+error TrackingNotEnabled()

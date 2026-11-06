@@ -1,0 +1,588 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Login">
+  <documentation>APIs for managing login sessions.</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="SessionType">
+    <documentation>Various types of sessions</documentation>
+    <body>
+      <values name="unspecified"/>
+      <values name="tty"/>
+      <values name="x11"/>
+      <values name="wayland"/>
+      <values name="mir"/>
+      <values name="web"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="SessionClass">
+    <documentation>Various classes of sessions</documentation>
+    <body>
+      <values name="user">
+        <documentation>Regular user sessions</documentation>
+      </values>
+      <values name="user_early">
+        <documentation>Session of the root user that shall be open for login from earliest moment on, and not be delayed for /run/nologin</documentation>
+      </values>
+      <values name="user_incomplete">
+        <documentation>Regular user session whose home directory is not available right now, but will be later, at which point the session class can be upgraded to 'user'</documentation>
+      </values>
+      <values name="user_light">
+        <documentation>A user session that doesn't pull in the per-user service manager</documentation>
+      </values>
+      <values name="user_early_light">
+        <documentation>The combination of user_early and user_light</documentation>
+      </values>
+      <values name="greeter">
+        <documentation>Display manager greeter screen used for login</documentation>
+      </values>
+      <values name="lock_screen">
+        <documentation>Similar, but a lock screen</documentation>
+      </values>
+      <values name="background">
+        <documentation>Background session (that has no TTY, VT, Seat)</documentation>
+      </values>
+      <values name="background_light">
+        <documentation>Similar, but for which no service manager is invoked</documentation>
+      </values>
+      <values name="manager">
+        <documentation>The special session of the service manager</documentation>
+      </values>
+      <values name="manager_early">
+        <documentation>The special session of the service manager for the root user</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="InhibitMode">
+    <documentation>Inhibition mode</documentation>
+    <body>
+      <values name="block">
+        <documentation>Hard inhibition; blocks the operation entirely</documentation>
+      </values>
+      <values name="block_weak">
+        <documentation>Weak hard inhibition; like block, but the user who set it can override it without polkit authorization</documentation>
+      </values>
+      <values name="delay">
+        <documentation>Soft inhibition; delays the operation but ultimately permits it</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="InhibitWhat">
+    <documentation>Operations that can be inhibited</documentation>
+    <body>
+      <values name="shutdown"/>
+      <values name="sleep"/>
+      <values name="idle"/>
+      <values name="handle_power_key"/>
+      <values name="handle_suspend_key"/>
+      <values name="handle_hibernate_key"/>
+      <values name="handle_lid_switch"/>
+      <values name="handle_reboot_key"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ProcessId">
+    <documentation>Process identifier</documentation>
+    <body>
+      <fields name="pid">
+        <documentation>Numeric UNIX PID value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="pidfdId">
+        <documentation>64bit inode number of pidfd if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="bootId">
+        <documentation>Boot ID of the system the inode number belongs to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Timestamp">
+    <documentation>Dual timestamp</documentation>
+    <body>
+      <fields name="realtime">
+        <documentation>Timestamp in µs in the CLOCK_REALTIME clock (wallclock)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="monotonic">
+        <documentation>Timestamp in µs in the CLOCK_MONOTONIC clock</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="SessionContext">
+    <documentation>Configuration aspects of a session (suitable for reuse as creation input)</documentation>
+    <body>
+      <fields name="UID">
+        <documentation>Numeric UNIX UID of the user owning this session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="PID">
+        <documentation>PID of the session leader</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="Type">
+        <documentation>The type of the session</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionType" definition="//@members[name='SessionType']"/>
+      </fields>
+      <fields name="Class">
+        <documentation>The class of the session</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionClass" definition="//@members[name='SessionClass']"/>
+      </fields>
+      <fields name="Service">
+        <documentation>PAM service name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Desktop">
+        <documentation>Desktop identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Seat">
+        <documentation>Seat this session is assigned to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="VTNr">
+        <documentation>Virtual terminal number of the session, if applicable</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="TTY">
+        <documentation>TTY device of the session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Display">
+        <documentation>X11 display of the session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Remote">
+        <documentation>Whether this is a remote session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="RemoteHost">
+        <documentation>Remote host, if this is a remote session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="RemoteUser">
+        <documentation>Remote user, if this is a remote session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ExtraDeviceAccess">
+        <documentation>Device paths this session has special access to</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="SessionRuntime">
+    <documentation>Runtime state and dynamic information of a session</documentation>
+    <body>
+      <fields name="Id">
+        <documentation>The session identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Scope">
+        <documentation>systemd scope unit name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Audit">
+        <documentation>Audit session ID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Timestamp">
+        <documentation>The session timestamps</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="State">
+        <documentation>Current state of the session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Active">
+        <documentation>Whether the session is active (i.e. in the foreground)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="IdleHint">
+        <documentation>Whether the session is idle</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="IdleSinceHint">
+        <documentation>Timestamp when the session went idle, only present when IdleHint is true</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="LockedHint">
+        <documentation>Whether the session is currently locked</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="CanIdle">
+        <documentation>Whether this session class supports idle tracking</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="CanLock">
+        <documentation>Whether this session class supports locking</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="UserContext">
+    <documentation>Configuration aspects of a user</documentation>
+    <body>
+      <fields name="UID">
+        <documentation>Numeric UNIX UID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="GID">
+        <documentation>Numeric UNIX GID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Name">
+        <documentation>User name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Linger">
+        <documentation>Whether lingering is enabled for this user</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="Service">
+        <documentation>Service manager unit name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Slice">
+        <documentation>User slice unit name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="RuntimePath">
+        <documentation>Path to the user's runtime directory</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="UserRuntime">
+    <documentation>Runtime state and dynamic information of a user</documentation>
+    <body>
+      <fields name="Display">
+        <documentation>Display session identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="State">
+        <documentation>Current state of the user</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Sessions">
+        <documentation>Identifiers of sessions belonging to this user</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="Timestamp">
+        <documentation>Timestamp when the user was 'started' for the first time</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="IdleHint">
+        <documentation>Whether the user is idle</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="IdleSinceHint">
+        <documentation>Timestamp when the user went idle, only present when IdleHint is true</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="SeatContext">
+    <documentation>Configuration aspects of a seat</documentation>
+    <body>
+      <fields name="Id">
+        <documentation>The seat identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="SeatRuntime">
+    <documentation>Runtime state and dynamic information of a seat</documentation>
+    <body>
+      <fields name="ActiveSession">
+        <documentation>The currently active session on this seat, if any</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Sessions">
+        <documentation>Identifiers of sessions assigned to this seat</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="CanTTY">
+        <documentation>Whether this seat supports text terminal sessions</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="CanGraphical">
+        <documentation>Whether this seat supports graphical sessions</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="IdleHint">
+        <documentation>Whether the seat is idle</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="IdleSinceHint">
+        <documentation>Timestamp when the seat went idle, only present when IdleHint is true</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="InhibitorContext">
+    <documentation>Configuration aspects of an inhibitor</documentation>
+    <body>
+      <fields name="Id">
+        <documentation>The inhibitor identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="What">
+        <documentation>What is being inhibited</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="InhibitWhat" definition="//@members[name='InhibitWhat']"/>
+        </type>
+      </fields>
+      <fields name="Who">
+        <documentation>A human-readable descriptive string of who is taking the inhibition</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Why">
+        <documentation>A human-readable descriptive string of why the inhibition is taken</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Mode">
+        <documentation>The inhibition mode</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="InhibitMode" definition="//@members[name='InhibitMode']"/>
+      </fields>
+      <fields name="UID">
+        <documentation>The UID of the user taking the inhibition</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="InhibitorRuntime">
+    <documentation>Runtime state and dynamic information of an inhibitor</documentation>
+    <body>
+      <fields name="PID">
+        <documentation>The PID of the process taking the inhibition</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="Since">
+        <documentation>The inhibitor timestamps</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="CreateSession">
+    <documentation>Allocates a new session.</documentation>
+    <input>
+      <fields name="UID">
+        <documentation>Numeric UNIX UID of the user owning this session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="PID">
+        <documentation>PID of the session leader</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="Type">
+        <documentation>The type of the session</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionType" definition="//@members[name='SessionType']"/>
+      </fields>
+      <fields name="Class">
+        <documentation>The class of the session</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionClass" definition="//@members[name='SessionClass']"/>
+      </fields>
+      <fields name="Service">
+        <documentation>PAM service name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Desktop">
+        <documentation>Desktop identifier</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Seat">
+        <documentation>Seat this session is assigned to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="VTNr">
+        <documentation>Virtual terminal number of the session, if applicable</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="TTY">
+        <documentation>TTY device of the session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Display">
+        <documentation>X11 display of the session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="Remote">
+        <documentation>Whether this is a remote session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="RemoteHost">
+        <documentation>Remote host, if this is a remote session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="RemoteUser">
+        <documentation>Remote user, if this is a remote session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ExtraDeviceAccess">
+        <documentation>Device paths this session has special access to</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </input>
+    <output>
+      <fields name="Id">
+        <documentation>The identifier string of the session of the user.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="RuntimePath">
+        <documentation>The runtime path ($XDG_RUNTIME_DIR) of the user.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="UID">
+        <documentation>The original UID of this session.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="Seat">
+        <documentation>The seat this session has been assigned to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="VTNr">
+        <documentation>The virtual terminal number the session has been assigned to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="Type">
+        <documentation>The assigned session type</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionType" definition="//@members[name='SessionType']"/>
+      </fields>
+      <fields name="Class">
+        <documentation>The assigned session class</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionClass" definition="//@members[name='SessionClass']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ReleaseSession">
+    <documentation>Releases an existing session. Currently, will be refused unless originating from the session to release itself.</documentation>
+    <input>
+      <fields name="Id">
+        <documentation>The identifier string of the session to release. If unspecified or 'self', will return the callers session.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="ListSessions" moreSupport="supported">
+    <documentation>Lists current sessions. If an Id or PID filter is provided, returns the single matching session; otherwise streams all current sessions (requires the 'more' flag).</documentation>
+    <input>
+      <fields name="Id">
+        <documentation>If non-null, the identifier string of a session to look up. Supports the special names 'self' and 'auto' which resolve to the caller's session.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="PID">
+        <documentation>If non-null, return the session containing the process with this PID. If both Id and PID are specified they must reference the same session, otherwise NoSuchSession is returned.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="context">
+        <documentation>Configuration of the session</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionContext" definition="//@members[name='SessionContext']"/>
+      </fields>
+      <fields name="runtime">
+        <documentation>Runtime information of the session</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SessionRuntime" definition="//@members[name='SessionRuntime']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListUsers" moreSupport="supported">
+    <documentation>Lists current users. If a UID or PID filter is provided, returns the single matching user; otherwise streams all current users (requires the 'more' flag).</documentation>
+    <input>
+      <fields name="UID">
+        <documentation>If non-null, the UNIX UID of a user to look up.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="PID">
+        <documentation>If non-null, return the user owning the cgroup containing the process with this PID. If both UID and PID are specified they must reference the same user, otherwise NoSuchUser is returned.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="context">
+        <documentation>Configuration of the user</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="UserContext" definition="//@members[name='UserContext']"/>
+      </fields>
+      <fields name="runtime">
+        <documentation>Runtime information of the user</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="UserRuntime" definition="//@members[name='UserRuntime']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListSeats" moreSupport="supported">
+    <documentation>Lists current seats. If an Id filter is provided, returns the single matching seat; otherwise streams all current seats (requires the 'more' flag).</documentation>
+    <input>
+      <fields name="Id">
+        <documentation>If non-null, the identifier string of a seat to look up.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="context">
+        <documentation>Configuration of the seat</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SeatContext" definition="//@members[name='SeatContext']"/>
+      </fields>
+      <fields name="runtime">
+        <documentation>Runtime information of the seat</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="SeatRuntime" definition="//@members[name='SeatRuntime']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListInhibitors" moreSupport="required">
+    <documentation>Lists all current inhibitors.</documentation>
+    <input/>
+    <output>
+      <fields name="context">
+        <documentation>Configuration of the inhibitor</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="InhibitorContext" definition="//@members[name='InhibitorContext']"/>
+      </fields>
+      <fields name="runtime">
+        <documentation>Runtime information of the inhibitor</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="InhibitorRuntime" definition="//@members[name='InhibitorRuntime']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchSession">
+    <documentation>No session by this name found</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchSeat">
+    <documentation>No seat by this name found</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchUser">
+    <documentation>No user by this UID found</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchInhibitor">
+    <documentation>No inhibitor found</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="AlreadySessionMember">
+    <documentation>Process already member of a session</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="VirtualTerminalAlreadyTaken">
+    <documentation>The specified virtual terminal (VT) is already taken by another session</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TooManySessions">
+    <documentation>Maximum number of sessions reached</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="UnitAllocationFailed">
+    <documentation>Failed to allocate a unit for the session</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSessionPIDFD">
+    <documentation>The session leader process does not have a pidfd</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Import">
+  <members xsi:type="varlink:EnumDefinition" name="ImageClass">
+    <documentation>Describes the class of images</documentation>
+    <body>
+      <values name="machine">
+        <documentation>An image to boot as a system on baremetal, in a VM or as a container</documentation>
+      </values>
+      <values name="portable">
+        <documentation>An portable service image</documentation>
+      </values>
+      <values name="sysext">
+        <documentation>A system extension image</documentation>
+      </values>
+      <values name="confext">
+        <documentation>A configuration extension image</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="RemoteType">
+    <documentation>Describes the type of a images to transfer</documentation>
+    <body>
+      <values name="raw">
+        <documentation>Raw binary disk images, typically in a GPT envelope</documentation>
+      </values>
+      <values name="tar">
+        <documentation>A tarball, optionally compressed</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="TransferType">
+    <documentation>Describes the type of a transfer</documentation>
+    <body>
+      <values name="import_tar">
+        <documentation>A local import of a tarball</documentation>
+      </values>
+      <values name="import_raw">
+        <documentation>A local import of a raw disk image</documentation>
+      </values>
+      <values name="import_fs">
+        <documentation>A local import of a file system tree</documentation>
+      </values>
+      <values name="export_tar">
+        <documentation>A local export of a tarball</documentation>
+      </values>
+      <values name="export_raw">
+        <documentation>A local export of a raw disk image</documentation>
+      </values>
+      <values name="pull_tar">
+        <documentation>A download of a tarball</documentation>
+      </values>
+      <values name="pull_raw">
+        <documentation>A download of a raw disk image</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ImageVerify">
+    <documentation>Describes whether and how thoroughly to verify the download before installing it locally</documentation>
+    <body>
+      <values name="no">
+        <documentation>No verification</documentation>
+      </values>
+      <values name="checksum">
+        <documentation>Verify that downloads match checksum file (SHA256SUMS), but do not check signature of checksum file</documentation>
+      </values>
+      <values name="signature">
+        <documentation>Verify that downloads match checksum file (SHA256SUMS), and check signature of checksum file.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="LogMessage">
+    <documentation>Structure for log messages associated with a transfer operation</documentation>
+    <body>
+      <fields name="message">
+        <documentation>The log message</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="priority">
+        <documentation>The priority of the log message, using the BSD syslog priority levels</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="ListTransfers" moreSupport="required">
+    <documentation>List ongoing transfers, or query details about specific transfers</documentation>
+    <input>
+      <fields name="class">
+        <documentation>Image class to filter by</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="id">
+        <documentation>A unique numeric identifier for the ongoing transfer</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="type">
+        <documentation>The type of transfer</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TransferType" definition="//@members[name='TransferType']"/>
+      </fields>
+      <fields name="remote">
+        <documentation>The remote URL</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="local">
+        <documentation>The local image name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="class">
+        <documentation>The class of the image</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']"/>
+      </fields>
+      <fields name="percent">
+        <documentation>Progress in percent</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="float"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Pull" moreSupport="supported">
+    <documentation>Download a .tar or .raw file. This must be called with the 'more' flag enabled. It will immediately return the numeric ID of the transfer, and then follow up with progress and log message updates, until the transfer is complete.</documentation>
+    <input>
+      <fields name="remote">
+        <documentation>The remote URL to download from</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="local">
+        <documentation>The local image name to download to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <documentation>The type of the resource</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="RemoteType" definition="//@members[name='RemoteType']"/>
+      </fields>
+      <fields name="class">
+        <documentation>The image class</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageClass" definition="//@members[name='ImageClass']"/>
+      </fields>
+      <fields name="verify">
+        <documentation>The whether and how thoroughly to verify the download before installing it locally. Defaults to 'signature'.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ImageVerify" definition="//@members[name='ImageVerify']" nullable="true"/>
+      </fields>
+      <fields name="force">
+        <documentation>If true, an existing image by the local name is deleted. Defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Whether to make the image read-only after downloading. Defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="keepDownload">
+        <documentation>Whether to keep a pristine copy of the download separate from the locally installed image. Defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="imageRoot">
+        <documentation>Root directory for images. If not specified derived from the image class, and located below /var/lib/.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="progress">
+        <documentation>A progress update, as percent value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="float" nullable="true"/>
+      </fields>
+      <fields name="log">
+        <documentation>A log message about the ongoing transfer</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LogMessage" definition="//@members[name='LogMessage']" nullable="true"/>
+      </fields>
+      <fields name="id">
+        <documentation>The numeric ID of this download</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="AlreadyInProgress">
+    <documentation>A transfer for the specified file is already ongoing</documentation>
+    <parameters>
+      <fields name="remote">
+        <documentation>The URL of the transfer already in progress.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TransferCancelled">
+    <documentation>The transfer has been cancelled on user request</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TransferFailed">
+    <documentation>The transfer failed</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoTransfers">
+    <documentation>No currently ongoing transfer</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

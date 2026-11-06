@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.FactoryReset">
+  <documentation>APIs to query factory reset status</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="FactoryResetMode">
+    <documentation>Encodes the current factory reset status</documentation>
+    <body>
+      <values name="unsupported">
+        <documentation>Factory reset is not supported on this OS.</documentation>
+      </values>
+      <values name="unspecified">
+        <documentation>Factory reset not requested.</documentation>
+      </values>
+      <values name="off">
+        <documentation>Factory reset explicitly turned off.</documentation>
+      </values>
+      <values name="on">
+        <documentation>Factory reset is currently being executed.</documentation>
+      </values>
+      <values name="complete">
+        <documentation>Factory reset has been completed during the current boot.</documentation>
+      </values>
+      <values name="pending">
+        <documentation>Factory reset has been requested for the next boot.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="GetFactoryResetMode">
+    <documentation>Report the current factory reset status</documentation>
+    <input/>
+    <output>
+      <fields name="mode">
+        <documentation>The current factory reset mode</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FactoryResetMode" definition="//@members[name='FactoryResetMode']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="CanRequestFactoryReset">
+    <documentation>Returns whether requesting a factory reset is available (by invoking the factory-reset.target unit).</documentation>
+    <input/>
+    <output>
+      <fields name="supported">
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+    </output>
+  </members>
+</varlink:Interface>

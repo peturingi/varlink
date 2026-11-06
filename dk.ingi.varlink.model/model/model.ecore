@@ -1,0 +1,1856 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="varlink" nsURI="https://ingi.dk/varlink" nsPrefix="varlink">
+  <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+    <details key="documentation" value="Metamodel of UAPI.20 Varlink IPC v0.1. This root package is the abstract syntax of the Varlink Interface Definition Language, transcribed production by production from the spec's grammar (sections 'Grammar' and 'Parsing Expression Grammar'). An Interface is the natural resource root (one per .varlink file). Subpackages: json (lossless JSON value model used for message payloads), protocol (wire protocol: Call, Reply, vendor extensions, reply sequences), service (services, GetInfo information, service addresses, the service registry directory), transport (socket activation, AF_UNIX socket inode roles), http (the HTTP bridge: routes, modes, media types, error-to-status mapping, bridge addresses). Everything whose documentation starts with 'systemd extension, not in UAPI.20 grammar' is NOT part of the specification: it is the convention of systemd's sd-varlink-idl implementation, carried as specially formatted comment lines in the IDL text (method flag lines and the [Experimental] marker), made first-class here because a client generator needs them."/>
+  </eAnnotations>
+  <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+    <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+  </eAnnotations>
+
+  <!-- ===================================================================== -->
+  <!-- Common abstractions                                                    -->
+  <!-- ===================================================================== -->
+  <eClassifiers xsi:type="ecore:EClass" name="InterfaceElement" abstract="true">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Any node of an interface definition tree, including the Interface itself. Exists to provide uniform navigation from anywhere in the tree to the owning Interface (needed to resolve named type references in the interface-local namespace) and to the enclosing Member (needed to name anonymous inline types after their position), and to compute systemd's inherited experimental status."/>
+    </eAnnotations>
+    <eOperations name="owningInterface" eType="#//Interface">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The Interface this element belongs to, found by walking up the containment tree; the Interface itself for an Interface; null for a detached element."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="if self.oclIsKindOf(Interface) then self.oclAsType(Interface) else let c = self.oclContainer() in if c = null then null else if c.oclIsKindOf(InterfaceElement) then c.oclAsType(InterfaceElement).owningInterface() else null endif endif endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eOperations name="enclosingMember" eType="#//Member">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The Member (type definition, method or error) that transitively contains this element, or the element itself if it is a Member; null for an Interface or a detached element. For a method parameter this is the Method, for a field of an inline struct nested in a named type it is that StructDefinition. A generator names anonymous inline structs and enumerations after it (see TypeExpression.positionPath())."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="if self.oclIsKindOf(Member) then self.oclAsType(Member) else let c = self.oclContainer() in if c = null then null else if c.oclIsKindOf(InterfaceElement) then c.oclAsType(InterfaceElement).enclosingMember() else null endif endif endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eOperations name="effectiveExperimental" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, not in UAPI.20 grammar: true if this element or any enclosing Declaration (field, member or interface) carries the experimental marker. systemd's validator (sd-varlink-idl.c, varlink_idl_symbol_consistent) treats experimental status as inherited by everything nested inside an experimental declaration; this is the 'experimental context' its three consistency rules refer to (constraints prefixed systemd on Field, EnumValue and NamedTypeReference)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="(self.oclIsKindOf(Declaration) and self.oclAsType(Declaration).experimental) or (let c = self.oclContainer() in if c = null then false else if c.oclIsKindOf(InterfaceElement) then c.oclAsType(InterfaceElement).effectiveExperimental() else false endif endif)"/>
+      </eAnnotations>
+    </eOperations>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="Declaration" abstract="true" eSuperTypes="#//InterfaceElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="A named, documentable declaration: the interface itself, a member (type, method, error), a struct field / method parameter / error parameter, or an enumeration value. Exactly these four kinds can carry a documentation comment per the spec ('Documentation Comments': comments immediately followed by interface, method, type or error; comments immediately preceding a field declaration inside a structure, enumeration or parameter list) and exactly these four kinds can carry systemd's '# [Experimental]' marker (sd-varlink-idl: interface, symbol, field and enum value flags)."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="systemdMarkersNotInDocumentation documentationLinesSingle"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="systemdMarkersNotInDocumentation" value="documentation->forAll(l | l &lt;> '[Experimental]')"/>
+      <details key="documentationLinesSingle" value="documentation->forAll(l | l.indexOf('\n') = 0 and l.indexOf('\r') = 0)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The identifier exactly as written in the IDL (case-sensitive ASCII). The lexical rule depends on the kind of declaration (interface_name for Interface, name for Member, field_name for Field and EnumValue) and is enforced by a nameSyntax constraint on each concrete kind. Also the key of the containment references members, fields and values (eKeys), so that URI fragments read //@members[name='GetInfo'] instead of positional indices."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="documentation" upperBound="-1" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The documentation comment, one entry per comment line in source order, without the leading '#' and without the single conventional separator space following it ('A single space following the # character is conventionally used as separator and is not part of the documentation text'; further leading spaces are kept, so indented comment blocks survive). Empty comment lines are kept as empty strings so that the line structure survives verbatim and a generator can emit the docstring unchanged. Attachment rule (spec 'Documentation Comments': comments that start on a new line and are immediately followed by the declaration): the maximal run of comment-only lines directly above the declaration (or above the field/value inside a parenthesised list), with no blank line between the block and the declaration; a comment at the end of a code line is not documentation, and comment lines after the last member or directly before ')' belong to nothing. sd-varlink-idl attaches every comment line between two items regardless of blank lines; its formatter never emits blank lines inside a block, so both rules agree on introspected text. Each entry is a single line (documentationLinesSingle): the PEG comment rule excludes line terminators. The systemd marker line '[Experimental]' is NOT documentation anywhere (it sets Declaration.experimental; systemdMarkersNotInDocumentation), and the four flag lines &quot;[Supports 'more' flag]&quot;, &quot;[Requires 'more' flag]&quot;, &quot;[Supports 'upgrade' flag]&quot;, &quot;[Requires 'upgrade' flag]&quot; are not documentation before a method (they set Method.moreSupport/upgradeSupport; Method.flagMarkersNotInDocumentation); before any other declaration they are ordinary comment text, exactly as sd-varlink-idl treats them."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="documentationText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived: the documentation lines joined with a line feed and no trailing line feed, i.e. the verbatim docstring text; the empty string when undocumented. A derived attribute rather than an operation so that AQL templates and Sirius labels can read it without invoking an operation."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="let n = documentation->size() in Sequence{1..n}->iterate(i; acc : String = '' | acc + documentation->at(i) + (if i &lt; n then '\n' else '' endif))"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="experimental" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, not in UAPI.20 grammar. True when the declaration is immediately preceded by the comment line '# [Experimental]' (sd-varlink-idl: SD_VARLINK_EXPERIMENTAL, settable on interface, symbol, field and enum value; 'The varlink IDL has no syntax for annotations, hence experimental interfaces, symbols and fields are marked with a comment line, placed immediately before the item. The parser recognizes the line and turns it back into SD_VARLINK_EXPERIMENTAL. Consider this part of the API.'). systemd's formatter emits the marker as the last comment line before the keyword / field name; its parser strips it. A consumer that only knows UAPI.20 sees an ordinary comment. Semantics (sd-varlink-idl validator): users of the non-experimental parts must not need to know about experimental ones, see the systemdExperimental* constraints on Field, EnumValue and NamedTypeReference."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- ===================================================================== -->
+  <!-- interface ::= "interface" interface_name members                       -->
+  <!-- ===================================================================== -->
+  <eClassifiers xsi:type="ecore:EClass" name="Interface" eSuperTypes="#//Declaration">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: interface ::= 'interface' interface_name members. 'An interface is a named collection of types, methods and errors, described in the Varlink interface definition language.' 'A Varlink interface has a reverse-domain name and specifies which methods the interface implements. Each method has named and typed input and output parameters. Complex types can be aliased with the type keyword ... The interface also specifies the errors that may be returned from its method calls.' The interface keyword MUST be the first keyword in the description. Interfaces have no version number ('Interface Evolution'): they are extended compatibly by adding nullable fields, members and enumeration values; an incompatible change SHOULD be released under a new name, e.g. org.example.interface2. This is the natural resource root: one Interface per .varlink file (files are named after the interface with the suffix .varlink). A resource may also hold several Interface roots next to a service.Service that references them. Name clash note: EMF generates a Java interface 'Interface' and class 'InterfaceImpl'; neither collides with java.lang."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="nameSyntax memberNamesUnique sourceNamesThisInterface"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="nameSyntax" value="name &lt;> null and name.matches('[A-Za-z]([-]*[A-Za-z0-9])*(\\.[A-Za-z0-9]([-]*[A-Za-z0-9])*)+')"/>
+      <details key="memberNamesUnique" value="members->isUnique(name)"/>
+      <details key="sourceNamesThisInterface" value="source &lt;> null implies source.indexOf('interface ' + name) > 0"/>
+    </eAnnotations>
+    <eOperations name="findMember" eType="#//Member">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Looks up a member (type, method or error) by its unqualified name in the interface's single shared namespace; null if absent."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let found = members->select(m | m.name = memberName) in if found->isEmpty() then null else found->first() endif"/>
+      </eAnnotations>
+      <eParameters name="memberName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The unqualified member name, e.g. GetInfo."/>
+        </eAnnotations>
+      </eParameters>
+    </eOperations>
+    <eOperations name="findType" eType="#//TypeDefinition">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The type definition (struct or enumeration alias) with the given name, or null. This is the lookup a parser performs to resolve a NamedTypeReference after the whole interface has been read (forward references are legal)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let found = members->selectByKind(TypeDefinition)->select(t | t.name = typeName) in if found->isEmpty() then null else found->first() endif"/>
+      </eAnnotations>
+      <eParameters name="typeName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The unqualified type name, e.g. DriveCondition."/>
+        </eAnnotations>
+      </eParameters>
+    </eOperations>
+    <eOperations name="findMethod" eType="#//Method">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The method with the given unqualified name, or null (the service would answer org.varlink.service.MethodNotFound)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let found = members->selectByKind(Method)->select(m | m.name = methodName) in if found->isEmpty() then null else found->first() endif"/>
+      </eAnnotations>
+      <eParameters name="methodName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The unqualified method name, e.g. Jump."/>
+        </eAnnotations>
+      </eParameters>
+    </eOperations>
+    <eOperations name="findError" eType="#//ErrorDefinition">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The error definition with the given unqualified name, or null."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let found = members->selectByKind(ErrorDefinition)->select(e | e.name = errorName) in if found->isEmpty() then null else found->first() endif"/>
+      </eAnnotations>
+      <eParameters name="errorName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The unqualified error name, e.g. NotEnoughEnergy."/>
+        </eAnnotations>
+      </eParameters>
+    </eOperations>
+    <eOperations name="fileName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'Interface definition files are named after the interface they implement with the suffix .varlink, e.g. org.example.ftl.varlink.'"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="if name = null then null else name + '.varlink' endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="members" lowerBound="1" upperBound="-1" eType="#//Member" containment="true" eOpposite="#//Member/interface" eKeys="#//Declaration/name">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Grammar: members ::= member | member members, i.e. at least one member (PEG: member ++ eol), in source order (kept so that the IDL text can be regenerated faithfully; use the derived types, methods and errors for filtered views). Types, methods and errors share one namespace (memberNamesUnique); name is the key (eKeys), so a reference into an interface resource reads //@members[name='GetInfo']. Forward references between members are allowed; they resolve after parsing. Dialect note: sd-varlink-idl (systemd 263) also accepts an interface without any member; the spec grammar does not. Introspected text is not in author order: systemd's formatter emits enum types, then struct types, then methods, then errors. Because name is the key, two unnamed siblings share the fragment //@members[name=null]; creation tools should assign a unique default name immediately."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="types" upperBound="-1" eType="#//TypeDefinition" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived convenience view: the members that are type definitions (StructDefinition and EnumDefinition), in source order."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="members->selectByKind(TypeDefinition)"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="methods" upperBound="-1" eType="#//Method" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived convenience view: the members that are methods, in source order."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="members->selectByKind(Method)"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="errors" upperBound="-1" eType="#//ErrorDefinition" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived convenience view: the members that are error definitions, in source order."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="members->selectByKind(ErrorDefinition)"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nameSegments" upperBound="-1" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived: the dot-separated components of the reverse-domain interface name, e.g. ['io','systemd','Machine']. 'They consist of at least two dot-separated components.' A generator must not map the segments 1:1 to a package path with the last segment as a leaf module: io.systemd and io.systemd.Machine, Network and Network.Link, SysUpdate and SysUpdate.Notify all coexist (and Import is a Python keyword); use one module per interface (e.g. the segments joined by '_') or a package per interface."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="let none : Sequence(String) = Sequence{} in if name = null then none else name.tokenize('.') endif"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="source" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Optional: the verbatim interface description text this model was parsed from, as returned by org.varlink.service.GetInterfaceDescription(interface) ('the interface definition of one interface, in the interface definition language described above, including all documentation comments, as a single string'). Kept so that a client library can serve or display the original text; not needed for generation and not an alternative encoding of the model (the abstract syntax is always the members tree); sourceNamesThisInterface only checks that the text declares this interface's name."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- ===================================================================== -->
+  <!-- member ::= type_alias | method | error                                 -->
+  <!-- ===================================================================== -->
+  <eClassifiers xsi:type="ecore:EClass" name="Member" abstract="true" eSuperTypes="#//Declaration">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: member ::= type_alias | method | error. 'Types, methods and error names MUST be unique identifiers within an interface definition; they share the same namespace. They are referenced by their fully-qualified reverse-domain name. The method GetInfo() in the interface org.example.test is called org.example.test.GetInfo.' Name rule: 'Type, method and error names start with an uppercase ASCII letter and continue with ASCII letters and digits.' (name ::= [A-Z][A-Za-z0-9]*). sd-varlink-idl calls members 'symbols'."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="nameSyntax"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="nameSyntax" value="name &lt;> null and name.matches('[A-Z][A-Za-z0-9]*')"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="interface" eType="#//Interface" eOpposite="#//Interface/members">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The containing interface (opposite of Interface.members); null while detached during bottom-up construction. (EMF handles the Java keyword as a feature name exactly as it does for its own EClass.interface.)"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="qualifiedName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived: the fully-qualified reverse-domain name, interface name + '.' + member name, e.g. org.example.test.GetInfo. This is the string used on the wire in protocol.Call.method and protocol.Reply.error."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="if name = null then null else if interface = null or interface.name = null then name else interface.name + '.' + name endif endif"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- type_alias ::= "type" name struct | "type" name enum -->
+  <eClassifiers xsi:type="ecore:EClass" name="TypeDefinition" abstract="true" eSuperTypes="#//Member">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: type_alias ::= 'type' name struct | 'type' name enum. 'A custom type: the definition of an object/record/structure, or of an enumeration.' 'Complex types can be aliased with the type keyword to allow reusing them and to make method signatures easier to read.' The two alternatives of the production are the two concrete subclasses StructDefinition and EnumDefinition, each with a body of the matching kind, so a generator dispatches on the class (one dataclass per StructDefinition, one Enum per EnumDefinition) without a cast. A NamedTypeReference resolves to a TypeDefinition. Named 'TypeDefinition' rather than 'Type' to avoid a confusingly generic Java name next to TypeExpression."/>
+    </eAnnotations>
+    <eOperations name="definedType" eType="#//CompositeType">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The body of the definition as a CompositeType, whichever concrete kind it is: the StructType of a StructDefinition or the EnumType of an EnumDefinition. Generic access for formatters and renderers (e.g. definedType().text()); templates that know the kind use the typed body feature of the subclass."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="if self.oclIsKindOf(StructDefinition) then self.oclAsType(StructDefinition).body else self.oclAsType(EnumDefinition).body endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="usages" upperBound="-1" eType="#//NamedTypeReference" transient="true" resolveProxies="false" eOpposite="#//NamedTypeReference/definition">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Inverse of NamedTypeReference.definition: every place in the interface where this type is used by name. Transient (not serialized; EMF maintains it in memory when the forward references are loaded; hence the forward reference does not resolve proxies, which is correct because type names are interface-local). Used for dependency ordering of generated classes and for detecting unused types."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="StructDefinition" eSuperTypes="#//TypeDefinition">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: type_alias ::= 'type' name struct. A named structure, e.g. type DriveConfiguration (speed: int, trajectory: int, duration: int). Referenced by NamedTypeReference; a Python generator emits one dataclass (or TypedDict) per StructDefinition. Note: the spec grammar admits the empty named struct 'type X ()'; systemd's parser rejects it ('Ambiguous empty () enum/struct is not permitted') because it cannot tell an empty struct from an empty enumeration. This model follows the grammar and allows it (documented, not constrained)."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="bodyNotNullable"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="bodyNotNullable" value="body &lt;> null and not body.nullable"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" lowerBound="1" eType="#//StructType" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The struct production following the type name. Grammatically a bare struct, never a '?'-prefixed type (bodyNotNullable keeps the inherited nullable slot false) and never a method parameter list (ParameterStruct.containedByMethod)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="EnumDefinition" eSuperTypes="#//TypeDefinition">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: type_alias ::= 'type' name enum. A named enumeration, e.g. type MachineClass (container, vm, host). Referenced by NamedTypeReference; a Python generator emits one enum.Enum (or typing.Literal) per EnumDefinition. JSON: a value is encoded as a string containing the value's name."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="bodyNotNullable"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="bodyNotNullable" value="body &lt;> null and not body.nullable"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="body" lowerBound="1" eType="#//EnumType" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The enum production following the type name (at least one value). Grammatically a bare enum, never a '?'-prefixed type (bodyNotNullable)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- method ::= "method" name struct "->" struct -->
+  <eClassifiers xsi:type="ecore:EClass" name="Method" eSuperTypes="#//Member">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: method ::= 'method' name struct '->' struct. 'A method specifies an input and an output parameter object. Both the input and the output parameter list may be empty, expressed as ().' Input and output parameter names are separate namespaces (two distinct ParameterStructs). Invoked on the wire by a protocol.Call whose method member is the qualifiedName and whose parameters match input; answered by protocol.Reply messages whose parameters match output (or an error). 'Errors of the interface a method belongs to, and the generic errors defined in org.varlink.service may be returned by any method.' The systemd call-flag conventions (moreSupport, upgradeSupport) are first-class here because a client generator needs them: a 'more' method becomes an iterator. The spec itself states 'The interface definition at this time carries no indication whether a method supports or requires more'."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="parameterStructsNotNullable flagMarkersNotInDocumentation"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="parameterStructsNotNullable" value="input &lt;> null and output &lt;> null and not input.nullable and not output.nullable"/>
+      <details key="flagMarkersNotInDocumentation" value="documentation->forAll(l | not l.matches('\\[(Supports|Requires) \'(more|upgrade)\' flag\\]'))"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="input" lowerBound="1" eType="#//ParameterStruct" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The input parameter object (the struct before '->'). Its fields, in order, are the method's input parameters; on the wire they form Call.parameters ('may be absent, null or {}' when the method takes no input parameters or all of them are nullable and omitted)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="output" lowerBound="1" eType="#//ParameterStruct" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The output parameter object (the struct after '->'). Its fields are the output parameters; on the wire they form Reply.parameters of a success reply. 'The IDL definition of a method that supports more MUST carry the combination of all possible replies as reply message definition, and MUST set ? on all fields that may be absent in at least one valid reply of the series.'"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="inputParameters" upperBound="-1" eType="#//Field" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived convenience: input.fields, the ordered input parameters."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="if input = null then OrderedSet{} else input.fields endif"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="outputParameters" upperBound="-1" eType="#//Field" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived convenience: output.fields, the ordered output parameters."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="if output = null then OrderedSet{} else output.fields endif"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="moreSupport" eType="#//CallFlagSupport" defaultValueLiteral="unspecified">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, not in UAPI.20 grammar. Whether the method supports or requires the 'more' call flag (sd-varlink-idl: SD_VARLINK_SUPPORTS_MORE / SD_VARLINK_REQUIRES_MORE). systemd emits it ONLY as a comment line immediately before 'method': &quot;# [Supports 'more' flag]&quot; or &quot;# [Requires 'more' flag]&quot; (the 'Requires' form wins when both bits are set), placed after the documentation lines and before any '# [Experimental]' line. systemd's own parser keeps these lines as plain comments; tools such as varlink-http-bridge interpret them, and systemd documents the comment text as API ('don't change, only extend'). The spec says the IDL carries no such indication, so unspecified is the only value a pure UAPI.20 parser can produce. A generator maps required to an iterator-only API, supported to both a single-call and an iterator variant, unspecified to a single call."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="upgradeSupport" eType="#//CallFlagSupport" defaultValueLiteral="unspecified">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, not in UAPI.20 grammar. Whether the method supports or requires the 'upgrade' call flag (SD_VARLINK_SUPPORTS_UPGRADE / SD_VARLINK_REQUIRES_UPGRADE), emitted as the comment line &quot;# [Supports 'upgrade' flag]&quot; or &quot;# [Requires 'upgrade' flag]&quot; immediately before 'method' (after any 'more' line, before any '# [Experimental]' line). Calling a method that requires upgrade without the flag yields org.varlink.service.ExpectedUpgrade; after the confirming reply the connection is no longer a Varlink connection."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="supportsMore" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, derived: moreSupport is supported or required, i.e. the method may be called with more=true and will stream replies (a generator emits an iterator variant)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="moreSupport &lt;> CallFlagSupport::unspecified"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requiresMore" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, derived: moreSupport = required, i.e. the method must be called with more=true (a generator emits only the iterator variant)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="moreSupport = CallFlagSupport::required"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="supportsUpgrade" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, derived: upgradeSupport is supported or required."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="upgradeSupport &lt;> CallFlagSupport::unspecified"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="requiresUpgrade" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="systemd extension, derived: upgradeSupport = required."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="upgradeSupport = CallFlagSupport::required"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="CallFlagSupport">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="systemd extension, not in UAPI.20 grammar. The three-valued support level a method declares for a call flag ('more' or 'upgrade'), mirroring the SUPPORTS_x / REQUIRES_x symbol flag bits of sd-varlink-idl. Three-valued rather than two booleans so that 'required' cannot be stated without 'supported' (the formatter prints [Requires ...] when the REQUIRES bit is set, else [Supports ...] when the SUPPORTS bit is set)."/>
+    </eAnnotations>
+    <eLiterals name="unspecified">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="No marker line. Per UAPI.20 this is the only state an interface definition can express ('The interface definition at this time carries no indication whether a method supports or requires more'); it does NOT mean 'not supported': a server may still honour the flag, and a server that does not simply answers with a single reply ('If the server does not support more for the method, it replies with a single reply without continues')."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="supported" value="1">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="&quot;# [Supports 'more' flag]&quot; / &quot;# [Supports 'upgrade' flag]&quot;: the flag may be set; without it the call behaves like a simple method call (systemd SD_VARLINK_SUPPORTS_MORE / SD_VARLINK_SUPPORTS_UPGRADE)."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="required" value="2">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="&quot;# [Requires 'more' flag]&quot; / &quot;# [Requires 'upgrade' flag]&quot;: the flag must be set; otherwise the service replies org.varlink.service.ExpectedMore / ExpectedUpgrade (systemd SD_VARLINK_REQUIRES_MORE / SD_VARLINK_REQUIRES_UPGRADE; implies supported)."/>
+      </eAnnotations>
+    </eLiterals>
+  </eClassifiers>
+
+  <!-- error ::= "error" name struct -->
+  <eClassifiers xsi:type="ecore:EClass" name="ErrorDefinition" eSuperTypes="#//Member">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: error ::= 'error' name struct. 'The name of an error, and an optional data object describing the error.' 'Error names start with an uppercase character and continue with alphanumeric characters, and optionally carry parameters describing the error. The error is identified by its fully-qualified name.' 'There are no error numbers and no mandatory human-readable messages. If required, interfaces MAY add a message field to the error parameters.' On the wire an error reply carries Reply.error = qualifiedName and Reply.parameters matching parameters. A Python generator emits one exception class per error with one attribute per parameter. Named 'ErrorDefinition' because an EClass 'Error' would generate a Java type shadowing java.lang.Error."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="parametersNotNullable"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="parametersNotNullable" value="parameters &lt;> null and not parameters.nullable"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" lowerBound="1" eType="#//StructType" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The error's parameter object; may be the empty struct '()'. Grammatically a bare struct (parametersNotNullable). On the wire these are Reply.parameters of an error reply."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- ===================================================================== -->
+  <!-- struct_field ::= field_name ":" type ; enum_fields ::= field_name ...  -->
+  <!-- ===================================================================== -->
+  <eClassifiers xsi:type="ecore:EClass" name="Field" eSuperTypes="#//Declaration">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: struct_field ::= field_name ':' type (PEG: argument). A field of a structure, which includes method input/output parameters and error parameters. 'Field names (of structures and enumerations, and of method parameters) start with an ASCII letter and continue with ASCII letters and digits. An underscore (_) may appear between two such characters, but not at the beginning or the end of the name, and not doubled.' Keywords such as 'type', 'interface' or 'class' are legal field names (seen in real interfaces); a binding generator must escape target-language reserved words. JSON mapping: 'each field a name/value pair' of the enclosing JSON object; a nullable field may be absent or null, 'Non-nullable fields must be present, and must not be null.'"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="nameSyntax systemdExperimentalFieldNullable"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="nameSyntax" value="name &lt;> null and name.matches('[A-Za-z](_?[A-Za-z0-9])*')"/>
+      <details key="systemdExperimentalFieldNullable" value="experimental implies ((type &lt;> null and type.nullable) or (structType &lt;> null and structType.effectiveExperimental()))"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" lowerBound="1" eType="#//TypeExpression" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The field's type expression (grammar production 'type'), nested to any depth."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="structType" eType="#//StructType" eOpposite="#//StructType/fields">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The structure declaring this field (opposite of StructType.fields): a named struct body, an inline struct, a method's ParameterStruct or an error's parameter struct."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nullable" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived convenience: type.nullable, i.e. the field was declared with a leading '?' and may be absent or null (Python: T | None with default None). The most frequent question a parameter/dataclass template asks."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="type &lt;> null and type.nullable"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="EnumValue" eSuperTypes="#//Declaration">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: one field_name of enum_fields ::= field_name | field_name ',' enum_fields. 'Enum: list of names without types, separated by comma.' Same lexical rule as a struct field name (nameSyntax); documentable like a field. JSON mapping: 'JSON string containing the enumeration value's name'. Values such as 'null', 'continue' or 'default' occur in real interfaces (io.systemd.Unit) and are reserved words in Python; a generator must escape them."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="nameSyntax systemdExperimentalValueInExperimentalEnum"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="nameSyntax" value="name &lt;> null and name.matches('[A-Za-z](_?[A-Za-z0-9])*')"/>
+      <details key="systemdExperimentalValueInExperimentalEnum" value="experimental implies (enumType &lt;> null and enumType.effectiveExperimental())"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="enumType" eType="#//EnumType" eOpposite="#//EnumType/values">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The enumeration declaring this value (opposite of EnumType.values)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- ===================================================================== -->
+  <!-- type ::= element_type | "[]" type | "[string]" type                    -->
+  <!--        | "?" element_type | "?" "[]" type | "?" "[string]" type        -->
+  <!-- ===================================================================== -->
+  <eClassifiers xsi:type="ecore:EClass" name="TypeExpression" abstract="true" eSuperTypes="#//InterfaceElement">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: type ::= element_type | '[]' type | '[string]' type | '?' element_type | '?' '[]' type | '?' '[string]' type. The six alternatives are exactly: an optional leading '?' followed by one of {element_type, '[]' type, '[string]' type}. The model mirrors that factorisation: every TypeExpression node carries 'nullable' (the optional '?' in front of THIS node) and is either an ElementType, an ArrayType or a MapType. Consequently '??T' is unrepresentable (a node has one '?' slot), while '[][]int', '[]?int' and '?[]?string' are representable, exactly as the grammar allows. (systemd's parser is narrower: it accepts '?' only outermost and a single '[]'/'[string]' level; this model follows the specification.) The same StructType/EnumType classes also stand in the grammar's bare struct/enum positions (type definition bodies, parameter lists, error parameters), where the grammar has no '?'; the constraints bodyNotNullable, parameterStructsNotNullable and parametersNotNullable keep the slot false there and a template never reads it in those positions."/>
+    </eAnnotations>
+    <eOperations name="text" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Renders the type expression back to IDL syntax on one line (without documentation comments), e.g. '?[]string', '[string]()', '(first: int, second: string)', 'MyOtherType'. Useful for formatters, round-trip tests and 'Varlink type: ...' docstrings."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="(if nullable then '?' else '' endif) + (if self.oclIsKindOf(ArrayType) then '[]' + (let e = self.oclAsType(ArrayType).elementType in if e = null then '?' else e.text() endif) else if self.oclIsKindOf(MapType) then '[string]' + (let m = self.oclAsType(MapType).valueType in if m = null then '?' else m.text() endif) else if self.oclIsKindOf(BuiltinType) then self.oclAsType(BuiltinType).keyword() else if self.oclIsKindOf(NamedTypeReference) then (let t = self.oclAsType(NamedTypeReference).typeName in if t = null then '?' else t endif) else if self.oclIsKindOf(EnumType) then '(' + self.oclAsType(EnumType).values->iterate(v; acc : String = '' | acc + (if acc = '' then '' else ', ' endif) + (if v.name = null then '?' else v.name endif)) + ')' else if self.oclIsKindOf(StructType) then '(' + self.oclAsType(StructType).fields->iterate(f; acc : String = '' | acc + (if acc = '' then '' else ', ' endif) + (if f.name = null then '?' else f.name endif) + ': ' + (if f.type = null then '?' else f.type.text() endif)) + ')' else '' endif endif endif endif endif endif)"/>
+      </eAnnotations>
+    </eOperations>
+    <eOperations name="enclosingField" eType="#//Field">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The Field whose type this expression is, or in which it is nested through ArrayType.elementType / MapType.valueType; null for a type definition body, a parameter list, an error's parameter struct or a detached expression. A generator uses it to name anonymous inline structs and enumerations after their position."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let c = self.oclContainer() in if c = null then null else if c.oclIsKindOf(Field) then c.oclAsType(Field) else if c.oclIsKindOf(TypeExpression) then c.oclAsType(TypeExpression).enclosingField() else null endif endif endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eOperations name="enclosingFields" upperBound="-1" unique="false" eType="#//Field">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="All Fields this expression is nested in, outermost first: for the type of field x inside the inline struct of field nested inside type Deep this is [nested, x]. Empty for a definition body, a parameter list or error parameters."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let none : Sequence(Field) = Sequence{} in let f = self.enclosingField() in if f = null then none else (if f.structType = null then none->append(f) else f.structType.enclosingFields()->append(f) endif) endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eOperations name="positionPath" upperBound="-1" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="A stable, interface-unique path naming the position of this type expression: the enclosing member's name, then 'input' or 'output' when the expression lies in a method's parameter list, then the names of the enclosing fields outermost first. Examples: ['Deep','nested','x'] for the type of x in type Deep (nested: ?[](x: ...)); ['List','output','addresses'] for the type of the output parameter addresses of method List; ['Detailed','more_data'] for the type of error parameter more_data; ['DriveCondition'] for the body of type DriveCondition; ['Jump','input'] for Jump's input struct itself. It is unique because member names, the direction and field names within one struct are unique and field names cannot contain '.'. To name anonymous inline structs and enumerations a generator must join the segments with a separator that no segment can contain: positionName() joins with '__' (member names contain no underscore, field names only single ones), whereas joining with '_' or CamelCase can collide (List_output_a_b vs List_output_a and b). Empty for a detached expression."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let empty : Sequence(String) = Sequence{} in let m = self.enclosingMember() in if m = null then empty else let fs = self.enclosingFields() in let outer = (if fs->isEmpty() then self else fs->first().structType endif) in let names : Sequence(String) = fs->collect(f | f.name) in let withDirection : Sequence(String) = (if m.oclIsKindOf(Method) and outer = m.oclAsType(Method).input then names->prepend('input') else if m.oclIsKindOf(Method) and outer = m.oclAsType(Method).output then names->prepend('output') else names endif endif) in withDirection->prepend(m.name) endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eOperations name="positionName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="positionPath() joined with '__', e.g. List__output__addresses or Detailed__more_data: a collision-free, stable, interface-unique identifier for an anonymous inline struct or enumeration, suitable as a generated class name after the target language's own escaping. Null for a detached expression."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let p : Sequence(String) = positionPath() in if p->isEmpty() then null else p->iterate(seg; acc : String = '' | if acc = '' then seg else acc + '__' + seg endif) endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="nullable" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="True when this node is prefixed by the 'maybe' token '?' (grammar: the '?' element_type, '?' '[]' type and '?' '[string]' type alternatives). 'Nullable: ? Nullable type (maybe)'. JSON mapping of ?T: 'Either the encoding of T, or JSON null, or the field is absent'; receivers MUST treat absent and null as equivalent, senders MAY omit null fields; for ?[]T / ?[string]T an empty collection is a valid non-null value. Interface evolution: 'New fields SHOULD be added as nullable (?) fields'. Note 'any' is defined as any value 'but not Nullable', yet '?any' is grammatical and simply allows null/absence in addition. Always false on a type definition body, a parameter list or an error's parameters (see TypeExpression)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- "[]" type -->
+  <eClassifiers xsi:type="ecore:EClass" name="ArrayType" eSuperTypes="#//TypeExpression">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: '[]' type. 'Array: ordered list of values of one type', e.g. []int. The element is a full 'type', so arrays nest ([][]int) and elements may be nullable ([]?int). JSON mapping: '[]T: JSON array'. Python: list[T]."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="elementType" lowerBound="1" eType="#//TypeExpression" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The type of every element (the 'type' following '[]')."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- "[string]" type -->
+  <eClassifiers xsi:type="ecore:EClass" name="MapType" eSuperTypes="#//TypeExpression">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: '[string]' type (PEG: dict). 'Map/Dictionary: map of values of one type, keyed by unique strings', e.g. [string]int. Keys are always strings; only the value type is declared. 'A set of strings can be expressed as a map with an empty structure as value type, i.e. [string]()' (see stringSet). JSON mapping: '[string]T: JSON object; each map element a name/value pair'. Python: dict[str, T]."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="valueType" lowerBound="1" eType="#//TypeExpression" containment="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The type of every map value (the 'type' following '[string]')."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="stringSet" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived: true for the '[string]()' idiom, i.e. the value type is the non-nullable empty struct: a set of strings (a Python generator may map it to set[str]). An attribute rather than an operation so that AQL and Java read it without invoking a delegate."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="valueType &lt;> null and valueType.oclIsKindOf(StructType) and not valueType.nullable and valueType.oclAsType(StructType).fields->isEmpty()"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- element_type ::= struct | enum | name | bool | int | float | string | object | any -->
+  <eClassifiers xsi:type="ecore:EClass" name="ElementType" abstract="true" eSuperTypes="#//TypeExpression">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: element_type ::= struct | enum | name | 'bool' | 'int' | 'float' | 'string' | 'object' | 'any'. The non-container alternatives: a built-in keyword type (BuiltinType), a reference to a named type (NamedTypeReference), or an inline anonymous struct or enum (CompositeType)."/>
+    </eAnnotations>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="BuiltinType" eSuperTypes="#//ElementType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="One of the six keyword types of element_type: bool, int, float, string, object, any. Which one is given by 'kind'. One class with an enumerated kind (rather than six classes) because the set is closed and a generator switches on it."/>
+    </eAnnotations>
+    <eOperations name="keyword" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The IDL keyword of kind as a plain string (bool, int, float, string, object, any); an explicit mapping because an enum literal's OCL toString() is its fully qualified name."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="if kind = BuiltinKind::bool then 'bool' else if kind = BuiltinKind::int then 'int' else if kind = BuiltinKind::float then 'float' else if kind = BuiltinKind::string then 'string' else if kind = BuiltinKind::object then 'object' else 'any' endif endif endif endif endif"/>
+      </eAnnotations>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" lowerBound="1" eType="#//BuiltinKind">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The keyword."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="BuiltinKind">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="The closed set of built-in type keywords of the IDL (spec table 'Types'), with their JSON encodings (spec table 'Mapping the Type System to JSON'). Literal names equal the IDL keywords; the generated Java constants are BOOL, INT, ..."/>
+    </eAnnotations>
+    <eLiterals name="bool">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'Boolean: true or false', e.g. flag: bool. JSON: true or false. Python: bool."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="int" value="1">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'Integer: signed integer, implementation-specific size, usually 64-bit', e.g. whole: int. JSON: number without fractional part or exponent. Implementations SHOULD support at least the signed 64-bit range, the unsigned 64-bit range is RECOMMENDED; values outside MAY be transported as strings, and implementations MAY leniently accept a JSON string containing a decimal integer. Python: int."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="float" value="2">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'Floating Point: implementation-specific size, usually IEEE 754 double', e.g. half: float. JSON: number. NaN, +Inf and -Inf MUST NOT be generated (JSON cannot represent them; encode as string or as a nullable float mapping them to null). Python: float."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="string" value="3">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'String: Unicode text', e.g. name: string. JSON: string. Python: str."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="object" value="4">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'Foreign Object: foreign, untyped/raw JSON object', e.g. payload: object. JSON: any JSON object. Python: dict[str, Any]. Named 'object' here as a literal; an EClass named 'Object' was deliberately avoided (java.lang.Object clash)."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="any" value="5">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'Any: any value: Boolean, Integer, Floating Point, String, (Foreign) Object, Enum, Map/Dictionary, Array, but not Nullable', e.g. value: any. JSON: any JSON value: true, false, numbers, strings, object, array, but not null. Python: a JSON value union."/>
+      </eAnnotations>
+    </eLiterals>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="NamedTypeReference" eSuperTypes="#//ElementType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: the 'name' alternative of element_type, e.g. example_other_type: MyOtherType. A use of a type defined with the 'type' keyword in the same interface ('Structures and enumerations may be ... given a name via type and referenced by that name'). Two features: typeName is the raw token as written (so a parser can create the node before the definition is known; sd-varlink-idl resolves forward references after the whole interface is parsed), and definition is the resolved EReference to the TypeDefinition, which must belong to the same interface (type names are interface-local; methods and errors cannot be referenced as types). Python: the generated class of the referenced definition."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="typeNameMatchesDefinition definitionInSameInterface systemdExperimentalTypeUsedInExperimentalContext"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="typeNameMatchesDefinition" value="definition &lt;> null implies typeName = definition.name"/>
+      <details key="definitionInSameInterface" value="definition &lt;> null and definition.interface &lt;> null and definition.interface = self.owningInterface()"/>
+      <details key="systemdExperimentalTypeUsedInExperimentalContext" value="definition &lt;> null implies (definition.experimental implies self.effectiveExperimental())"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="typeName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The referenced type name exactly as written in the IDL (grammar: name = [A-Z][A-Za-z0-9]*). Must equal definition.name once resolved (typeNameMatchesDefinition); used by text() so that even a transiently unresolved reference renders."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="definition" lowerBound="1" eType="#//TypeDefinition" resolveProxies="false" eOpposite="#//TypeDefinition/usages">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The resolved type definition (non-containment, required: an unresolved reference is a validation error, exactly as sd-varlink-idl refuses an unresolved symbol). Must belong to the same interface as this reference (definitionInSameInterface), hence always to the same resource, hence resolveProxies=false, which also lets the transient opposite TypeDefinition.usages exist."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="CompositeType" abstract="true" eSuperTypes="#//ElementType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="A struct or enum production. Appears in two grammatical positions: as the body of a type_alias (StructDefinition.body / EnumDefinition.body, named) and inline as an element_type ('Structures and enumerations may be declared anonymously inline'), nested at any depth; a StructType additionally stands as a method's parameter list (ParameterStruct) and as an error's parameters. The derived attribute inline tells the positions apart without reflection."/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="inline" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="True also for the empty value struct of the [string]() string-set idiom (it is an anonymous struct in an inline position); a generator that renders string sets through MapType.stringSet simply never visits that struct. Derived: true when this composite is an anonymous inline type, i.e. it is the type of a Field or the element/value type of a container; false when it is a type definition body, a method parameter list or an error's parameters. A generator emits a named class for every inline composite (named after positionPath()) and reuses the definition's name otherwise."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="let c = self.oclContainer() in c &lt;> null and (c.oclIsKindOf(Field) or c.oclIsKindOf(ArrayType) or c.oclIsKindOf(MapType))"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- struct ::= "(" struct_fields ")" | "(" ")" -->
+  <eClassifiers xsi:type="ecore:EClass" name="StructType" eSuperTypes="#//CompositeType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: struct ::= '(' struct_fields ')' | '(' ')'. 'Object: structure of named, typed fields, separated by comma', e.g. (first: int, second: string). The empty struct '()' has no fields: it is the empty parameter list of methods and errors, and the value type of the string-set idiom [string](). Resolves the PEG ambiguity between '()' as venum and as vstruct: an empty '()' is always a StructType (an EnumType has at least one value), as sd-varlink-idl does for parameter lists. A trailing comma before ')' is rejected both by the spec grammar and by sd-varlink-idl (systemd 263: 'Bad syntax'); it has no model representation. JSON mapping: 'JSON object; each field a name/value pair'."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="fieldNamesUnique"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="fieldNamesUnique" value="fields->isUnique(name)"/>
+    </eAnnotations>
+    <eOperations name="findField" eType="#//Field">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The field (or parameter) with the given name, or null."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="body" value="let found = fields->select(f | f.name = fieldName) in if found->isEmpty() then null else found->first() endif"/>
+      </eAnnotations>
+      <eParameters name="fieldName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The field name as written, e.g. tylium_level."/>
+        </eAnnotations>
+      </eParameters>
+    </eOperations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="fields" upperBound="-1" eType="#//Field" containment="true" eOpposite="#//Field/structType" eKeys="#//Declaration/name">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Grammar: struct_fields ::= struct_field | struct_field ',' struct_fields, in source order (order matters for generated signatures and faithful re-emission; the wire protocol itself is name-based: 'Varlink does not use positional parameters'). Field names are unique within the struct because they map to the keys of one JSON object; name is the key (eKeys)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EClass" name="ParameterStruct" eSuperTypes="#//StructType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="The input or output parameter list of a Method (grammar: the two struct positions of method ::= 'method' name struct '->' struct). A StructType in a position where it is not a type: it cannot be nullable (Method.parameterStructsNotNullable), cannot be referenced by name and only ever sits under a Method (containedByMethod). Its fields are the parameters; input and output names are separate namespaces. A distinct class so that templates dispatch on it and read direction and method without reflection on the containing feature. (Error parameters are a plain StructType under ErrorDefinition.parameters.)"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="containedByMethod"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="containedByMethod" value="let c = self.oclContainer() in c &lt;> null and c.oclIsKindOf(Method)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="method" eType="#//Method" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived: the owning Method (the container). Derived rather than an opposite because one reference cannot be the opposite of two containments (Method.input and Method.output)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="let c = self.oclContainer() in if c &lt;> null and c.oclIsKindOf(Method) then c.oclAsType(Method) else null endif"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="direction" eType="#//ParameterDirection" changeable="false" volatile="true" transient="true" derived="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Derived: output if this struct is its method's output list, input otherwise."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="derivation" value="let c = self.oclContainer() in if c &lt;> null and c.oclIsKindOf(Method) and c.oclAsType(Method).output = self then ParameterDirection::output else ParameterDirection::input endif"/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <eClassifiers xsi:type="ecore:EEnum" name="ParameterDirection">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Whether a ParameterStruct is the input or the output parameter list of its method (sd-varlink-idl: SD_VARLINK_INPUT / SD_VARLINK_OUTPUT)."/>
+    </eAnnotations>
+    <eLiterals name="input">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The list before '->': the parameters sent in Call.parameters."/>
+      </eAnnotations>
+    </eLiterals>
+    <eLiterals name="output" value="1">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The list after '->': the parameters received in Reply.parameters of a success reply."/>
+      </eAnnotations>
+    </eLiterals>
+  </eClassifiers>
+
+  <!-- enum ::= "(" enum_fields ")" -->
+  <eClassifiers xsi:type="ecore:EClass" name="EnumType" eSuperTypes="#//CompositeType">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Grammar: enum ::= '(' enum_fields ')' with enum_fields ::= field_name | field_name ',' enum_fields, i.e. at least one value (values has lower bound 1), e.g. (one, two, three). JSON mapping: 'JSON string containing the enumeration value's name'. Interface evolution: 'New enumeration values may be added to enumerations used in method input parameters; adding values to enumerations that appear in replies is only backwards compatible if clients are prepared to handle unknown values, which SHOULD be documented.' Python: enum.Enum for a named enum, typing.Literal for an inline one."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="constraints" value="valueNamesUnique"/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+      <details key="valueNamesUnique" value="values->isUnique(name)"/>
+    </eAnnotations>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="values" lowerBound="1" upperBound="-1" eType="#//EnumValue" containment="true" eOpposite="#//EnumValue/enumType" eKeys="#//Declaration/name">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The enumeration values in source order; at least one; names unique; name is the key (eKeys)."/>
+      </eAnnotations>
+    </eStructuralFeatures>
+  </eClassifiers>
+
+  <!-- ===================================================================== -->
+  <!-- Subpackage json: JSON (RFC 8259) value model for message payloads      -->
+  <!-- ===================================================================== -->
+  <eSubpackages name="json" nsURI="https://ingi.dk/varlink/json" nsPrefix="json">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="A small, lossless model of JSON (RFC 8259) values, so that protocol messages can carry parameters as structured data. Spec section 'Mapping the Type System to JSON': bool -> true/false; int -> number without fractional part or exponent; float -> number; string -> string; structure -> object (each field a name/value pair); enumeration -> string with the value's name; [string]T -> object; []T -> array; ?T -> encoding of T, or null, or the field absent (absent and null MUST be treated as equivalent; an empty array/object is NOT equivalent to null); object -> any JSON object; any -> any JSON value but not null. Messages MUST be UTF-8. Checking a JsonValue against a TypeExpression is deliberately not modelled (documented only): it is runtime behaviour of a binding ('Unknown Fields': services SHOULD reject undeclared call fields with org.varlink.service.InvalidParameter, clients SHOULD ignore undeclared reply fields)."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    </eAnnotations>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonValue" abstract="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Any JSON value: object, array, string, number, true/false or null. Deliberately generic: it is the wire form, validated against the IDL types by an implementation, not by this metamodel."/>
+      </eAnnotations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonObject" eSuperTypes="#//json/JsonValue">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="A JSON object: an ordered list of name/value members with unique names. Encodes Varlink structures (field name -> value), maps [string]T (key -> value), and the foreign 'object' type. The parameters member of calls and replies and vendor extension objects are JsonObjects."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="memberNamesUnique"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="memberNamesUnique" value="members->isUnique(name)"/>
+      </eAnnotations>
+      <eOperations name="member" eType="#//json/JsonValue">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The value of the member with the given name, or null when absent (callers treat absent and JsonNull alike for nullable fields)."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="let found = members->select(x | x.name = memberName) in if found->isEmpty() then null else found->first().value endif"/>
+        </eAnnotations>
+        <eParameters name="memberName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="The member name (a Varlink field name or map key)."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="members" upperBound="-1" eType="#//json/JsonMember" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The name/value pairs in document order."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonMember">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="One name/value pair of a JSON object."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The member name (a Varlink field name, map key, or header member such as 'method')."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="value" lowerBound="1" eType="#//json/JsonValue" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The member value; JsonNull for an explicit null."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonArray" eSuperTypes="#//json/JsonValue">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="A JSON array; encodes Varlink []T values."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1" eType="#//json/JsonValue" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The elements in order."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonString" eSuperTypes="#//json/JsonValue">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="A JSON string; encodes Varlink string values and enumeration value names (and, leniently, integers transported as formatted decimal strings)."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The decoded Unicode text."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonNumber" eSuperTypes="#//json/JsonValue">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="A JSON number, kept as its lexical text so that the int/float distinction ('JSON number without fractional part or exponent' versus 'JSON number') and the full 64-bit (and beyond) integer range survive without loss. Encodes Varlink int and float."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="lexicalSyntax"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="lexicalSyntax" value="lexical &lt;> null and lexical.matches('-?(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][+-]?[0-9]+)?')"/>
+      </eAnnotations>
+      <eOperations name="isInteger" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="True when the lexical form has neither fractional part nor exponent, i.e. it is a valid encoding of a Varlink int."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="lexical.matches('-?(0|[1-9][0-9]*)')"/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="lexical" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The number exactly as written in the JSON text (RFC 8259 number grammar), e.g. 48732498234, -12.4 or 1e3."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonBoolean" eSuperTypes="#//json/JsonValue">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="JSON true or false; encodes Varlink bool and the call/reply flags."/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The boolean value."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="JsonNull" eSuperTypes="#//json/JsonValue">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="JSON null: the explicit encoding of an absent nullable value ('the field being absent ... and the field being present with the value null' MUST be treated as equivalent). Never a valid encoding of a non-nullable type, nor of 'any'."/>
+      </eAnnotations>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- ===================================================================== -->
+  <!-- Subpackage protocol: wire protocol messages                            -->
+  <!-- ===================================================================== -->
+  <eSubpackages name="protocol" nsURI="https://ingi.dk/varlink/protocol" nsPrefix="protocol">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Spec section 'Wire Protocol'. 'All messages are encoded as JSON objects. Over stream transports, each message is terminated with a single NUL byte (0x00)' (the NUL belongs to the transport; HTTP framing replaces it). Messages MUST be UTF-8. 'A service responds to requests in the same order that they are received - messages are never multiplexed, and there are no sequence numbers'; requests may be pipelined. Call and Reply mirror the varlink structs the spec gives for them; Exchange lets the reply-sequencing rules of oneway/more/upgrade be stated as invariants. Prose-only rules documented here, not modelled ('Connection Lifecycle'): a connection is established by the client; either side may close at any time; a server SHOULD abort processing and MUST discard pending replies when the client closes; servers MUST close the connection on malformed messages (invalid JSON, non-object top level, missing method, unknown unprefixed header member, non-boolean flag, more than one of oneway/more/upgrade); servers MAY enforce message size / connection limits. Peer credentials (SO_PEERCRED / SO_PEERPIDFD) are a property of the AF_UNIX connection, not of a message, and are documented on the transport package."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    </eAnnotations>
+    <eClassifiers xsi:type="ecore:EClass" name="Message" abstract="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="'A message is a single JSON object exchanged over a connection, either a call (client to service) or a reply (service to client).' 'Call and reply messages are objects with properties, conceptually similar to HTTP headers. The parameters member is the payload.' The protocol is 'intentionally free of transport-specific side channels': file descriptors passed over AF_UNIX are not part of the message (documented on the transport package)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="vendorsUnique"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="vendorsUnique" value="vendorExtensions->isUnique(vendor)"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="parameters" eType="#//json/JsonObject" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Spec struct member 'parameters: ?object'. For a call: 'the input parameters, an object matching the method's input parameter declaration'. For a reply: 'the output parameters of the reply, or the parameters of the error'. An absent member, null and {} MUST be treated as equivalent by receivers; senders SHOULD omit the member when empty. Modelled as optional (absent = null here); an empty JsonObject is the explicit {} form."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="vendorExtensions" upperBound="-1" eType="#//protocol/VendorExtension" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Spec 'Vendor Extensions': additional header members, each nested in an object named after the vendor in reverse-domain notation, one object per vendor (vendorsUnique). Implementations SHOULD ignore vendor extension objects they do not understand and MUST reject unknown unprefixed members by closing the connection."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Call" eSuperTypes="#//protocol/Message">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Call': ( method: string, parameters: ?object, oneway: ?bool, more: ?bool, upgrade: ?bool ). 'At most one of oneway, more and upgrade may be set to true in a single call. A server MUST reject calls that set more than one of them, or that set any of them to a non-boolean value, by closing the connection.' The three nullable bools are modelled as EBoolean defaulting to false: an absent flag and an explicit false are semantically identical."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="atMostOneFlag methodQualified methodDefinitionMatches"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="atMostOneFlag" value="(if oneway then 1 else 0 endif) + (if more then 1 else 0 endif) + (if upgrade then 1 else 0 endif) &lt;= 1"/>
+        <details key="methodQualified" value="method &lt;> null and method.matches('[A-Za-z]([-]*[A-Za-z0-9])*(\\.[A-Za-z0-9]([-]*[A-Za-z0-9])*)+\\.[A-Z][A-Za-z0-9]*')"/>
+        <details key="methodDefinitionMatches" value="methodDefinition &lt;> null implies methodDefinition.qualifiedName = method"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="method" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'The fully-qualified method name, i.e. interface.method. REQUIRED.' e.g. org.example.ftl.CalculateConfiguration."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="oneway" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Instructs the server to suppress its reply', neither success nor error. 'The server MUST adhere to the instruction, to allow clients to associate the next reply with the next call issued without oneway.' All servers MUST implement oneway. The client never learns about failures of a oneway call."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="more" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Requests possibly multiple replies to the same call.' Support is optional per method: if unsupported the call behaves like a simple call; if supported the server sends zero or more replies with continues=true followed by exactly one final reply without continues (or an error reply), and MUST NOT process further calls on the connection until then. Methods that only make sense with more SHOULD reply ExpectedMore when called without it. Whether a method supports it is a systemd convention in the IDL (varlink.Method.moreSupport)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="upgrade" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Requests the connection to be taken over by a custom protocol/payload.' The server confirms with a single reply (which may carry parameters); afterwards the connection is no longer Varlink. An error reply leaves the connection a Varlink connection. Neither side may consume bytes beyond the NUL terminator of the upgrade call / confirming reply. ExpectedUpgrade SHOULD be returned when a method requiring the flag is called without it."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="methodDefinition" eType="#//Method">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Optional resolved link to the IDL Method this call invokes (convenience for tooling and fixtures; not on the wire; typically a cross-resource reference //@members[name='...'] into an interface resource). When set, its qualified name must equal 'method'."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="interfaceName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false" volatile="true" transient="true" derived="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Derived: the interface part of 'method', i.e. everything before the last '.' (the HTTP bridge derives the service name the same way)."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="derivation" value="if method = null or method.lastIndexOf('.') &lt; 2 then null else method.substring(1, method.lastIndexOf('.') - 1) endif"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="methodName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false" volatile="true" transient="true" derived="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Derived: the unqualified method name, i.e. everything after the last '.'."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="derivation" value="if method = null then null else let i : Integer = method.lastIndexOf('.') in if i &lt; 1 then method else if i &gt;= method.size() then null else method.substring(i + 1, method.size()) endif endif endif"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Reply" eSuperTypes="#//protocol/Message">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Reply': ( parameters: ?object, continues: ?bool, error: ?string ). 'continues MUST NOT be set in an error reply: an error reply always terminates the call it belongs to.' Errors 'are interface-specific and identified by a fully-qualified string. There are no error numbers and no mandatory human-readable messages' (interfaces MAY add a 'message' parameter). Any method may return the errors of its own interface and the generic org.varlink.service errors (service.StandardError)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="errorReplyNeverContinues errorQualified errorDefinitionMatches"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="errorReplyNeverContinues" value="error &lt;> null implies not continues"/>
+        <details key="errorQualified" value="error &lt;> null implies error.matches('[A-Za-z]([-]*[A-Za-z0-9])*(\\.[A-Za-z0-9]([-]*[A-Za-z0-9])*)+\\.[A-Z][A-Za-z0-9]*')"/>
+        <details key="errorDefinitionMatches" value="errorDefinition &lt;> null implies errorDefinition.qualifiedName = error"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="continues" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Instructs the client to expect further replies to the same call. Only valid if the call requested it with more.' 'Servers MUST NOT set continues in replies to calls that did not set more.' Absent and false are equivalent."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="error" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'The fully-qualified reverse-domain error name. Its presence indicates that the method call has failed.' e.g. org.example.ftl.ParameterOutOfRange or org.varlink.service.InvalidParameter. Null for a success reply."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="errorDefinition" eType="#//ErrorDefinition">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Optional resolved link to the IDL ErrorDefinition named by 'error' (convenience; not on the wire). When set, its qualified name must equal 'error'."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="errorReply" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" changeable="false" volatile="true" transient="true" derived="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Derived: true when the 'error' member is present, i.e. the call failed. (Named errorReply, not isError, so that the generated Java accessor is isErrorReply().)"/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="derivation" value="error &lt;> null"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="VendorExtension">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Vendor Extensions': 'Added members MUST be nested in an object named after the vendor in reverse-domain notation, e.g. &quot;org.example&quot;: { ... }. Such names always contain at least one . character, which distinguishes them from the members defined by this specification. Vendors MUST NOT add unprefixed keys or keys with an X--style prefix.'"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="vendorReverseDomain"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="vendorReverseDomain" value="vendor &lt;> null and vendor.matches('[A-Za-z]([-]*[A-Za-z0-9])*(\\.[A-Za-z0-9]([-]*[A-Za-z0-9])*)+')"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="vendor" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The reverse-domain vendor name used as the header member name, e.g. org.example (same lexical rule as an interface name, hence at least one '.')."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="value" lowerBound="1" eType="#//json/JsonObject" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The vendor's extension object (its members are vendor-defined)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="Exchange">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Modelling convenience (not a wire construct): one call together with the ordered sequence of replies it produced, so that the spec's reply-sequencing rules for oneway, more and upgrade (sections 'oneway', 'more', 'upgrade') can be stated as constraints and used in test fixtures and traces. An Exchange is a complete exchange: the call and every reply the service sent for it. A 'more' stream that ended because the client closed the connection (which the spec allows at any time; the server then discards pending replies) is not an Exchange and cannot be stored as one. A legal resource root."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="onewayHasNoReplies singleReplyUnlessMore continuesOnlyWhenMore finalReplyTerminates intermediateRepliesContinue upgradeConfirmedOnce"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="onewayHasNoReplies" value="call.oneway implies replies->isEmpty()"/>
+        <details key="singleReplyUnlessMore" value="not call.more implies replies->size() &lt;= 1"/>
+        <details key="continuesOnlyWhenMore" value="not call.more implies replies->forAll(r | not r.continues)"/>
+        <details key="finalReplyTerminates" value="replies->notEmpty() implies not replies->last().continues"/>
+        <details key="intermediateRepliesContinue" value="Sequence{1..replies->size() - 1}->forAll(i | replies->at(i).continues)"/>
+        <details key="upgradeConfirmedOnce" value="call.upgrade implies replies->size() &lt;= 1"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="call" lowerBound="1" eType="#//protocol/Call" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The call that opened the exchange."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="replies" upperBound="-1" eType="#//protocol/Reply" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The replies in the order received: none for oneway; at most one unless 'more' was set; all but the last carry continues=true; an error reply is always last; an upgrade is confirmed by a single reply."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- ===================================================================== -->
+  <!-- Subpackage service: services, service information, addresses, registry -->
+  <!-- ===================================================================== -->
+  <eSubpackages name="service" nsURI="https://ingi.dk/varlink/service" nsPrefix="service">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Spec sections 'Terminology' (service), 'The org.varlink.service Interface', 'Service Addresses' and 'Service Registry Directory'. 'A service is a program that implements one or more interfaces and accepts connections from clients.' Every service SHOULD implement org.varlink.service (GetInfo, GetInterfaceDescription and the generic errors). A Service is a second kind of resource root; it references Interface definitions (which usually live in their own resources, one per .varlink file, or as sibling roots in the same resource) rather than containing them, so that one definition can be shared by several services and a GetInfo snapshot (names only) is representable without definitions. The registry directory is modelled here (not in transport) because it is the discovery mechanism for services and would otherwise create a package cycle (transport -> service -> transport). The HTTP bridge's address form lives in the http package."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    </eAnnotations>
+    <eClassifiers xsi:type="ecore:EClass" name="Service">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="A Varlink service: the interfaces it implements, what org.varlink.service.GetInfo reports about it, the addresses it is reachable at, how it was socket-activated, the socket inodes it manages and its registry entries. Resource root for a multi-interface model (e.g. the 31 interfaces of a systemd host, each in its own .varlink resource)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="interfaceNamesUnique informationListsImplementedInterfaces registryEntriesNameImplementedInterfaces"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="interfaceNamesUnique" value="interfaces->isUnique(name)"/>
+        <details key="informationListsImplementedInterfaces" value="information &lt;> null implies interfaces->forAll(i | information.interfaces->includes(i.name))"/>
+        <details key="registryEntriesNameImplementedInterfaces" value="(interfaces->notEmpty() or information &lt;> null) implies registryEntries->forAll(e | self.implementsInterface(e.interfaceName))"/>
+      </eAnnotations>
+      <eOperations name="implementsInterface" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="True when the named interface is among the resolved interface definitions or is listed in the service information (otherwise the service would answer org.varlink.service.InterfaceNotFound)."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="interfaces->exists(i | i.name = interfaceName) or (information &lt;> null and information.interfaces->includes(interfaceName))"/>
+        </eAnnotations>
+        <eParameters name="interfaceName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="A fully-qualified interface name, e.g. io.systemd.Machine."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Optional well-known service name as used by the HTTP bridge ('The bridge serves a set of Varlink services, each identified by their name') and by the registry; conventionally the name of the service's primary interface, e.g. io.systemd.Hostname. The spec gives services no intrinsic name, hence optional (an HttpBridge requires it for the services it serves)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="information" eType="#//service/ServiceInformation" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="What org.varlink.service.GetInfo() returns for this service, if known."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="interfaces" upperBound="-1" eType="#//Interface">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The resolved definitions of the interfaces the service implements (non-containment, typically cross-resource references to one Interface root per .varlink file; the same Interface may be referenced by several services). GetInterfaceDescription(interface) returns each of them as IDL text (Interface.source)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="addresses" upperBound="-1" eType="#//service/ServiceAddress" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The service addresses (entrypoints) the service is accessible through."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="socketActivation" eType="#//transport/SocketActivationEnvironment" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The socket activation environment the service was started with, if any."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="sockets" upperBound="-1" eType="#//transport/SocketInode" containment="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="AF_UNIX socket inodes the service creates or manages (listen, server, entrypoint roles)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="registryEntries" upperBound="-1" eType="#//service/RegistryEntry" eOpposite="#//service/RegistryEntry/service">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The entries in a ServiceRegistry that lead to this service (non-containment opposite of RegistryEntry.service; the entries are contained by the registry). 'A service implementing multiple well-known interfaces SHOULD be registered under each of them' (registryEntriesNameImplementedInterfaces). EMF serializes both ends of this non-containment pair; a hand-written XMI may list the links on either end (or both, consistently), since the loader sets the opposite end when it resolves one, e.g. registryEntries=&quot;registry.xmi#//@entries.0&quot; on the service."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="ServiceInformation">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Mirror of the output parameters of org.varlink.service.GetInfo: ( vendor: string, product: string, version: string, url: string, interfaces: []string ). 'GetInfo() returns information about the service implementation (vendor, product, version, url), and the list of interfaces it implements in interfaces. The list MUST include org.varlink.service itself.' The HTTP bridge returns the same object for GET .../services/{service}. Examples from the spec: (Fedora, Workstation, 27, https://getfedora.org/en/workstation/) and (Jon Doe, Fidget Service, 0.2, https://example.com/jon/fidget)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="includesVarlinkService interfaceNamesWellFormed"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="includesVarlinkService" value="interfaces->includes('org.varlink.service')"/>
+        <details key="interfaceNamesWellFormed" value="interfaces->forAll(n | n.matches('[A-Za-z]([-]*[A-Za-z0-9])*(\\.[A-Za-z0-9]([-]*[A-Za-z0-9])*)+'))"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="vendor" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="&quot;String identifying the vendor of this service&quot; (field comment in systemd's org.varlink.service.varlink; the spec's GetInfo declaration carries none), e.g. Fedora."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="product" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="&quot;String identifying the product implementing this service&quot; (field comment in systemd's org.varlink.service.varlink; the spec's GetInfo declaration carries none), e.g. Workstation."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="version" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="&quot;Version string of this product&quot; (field comment in systemd's org.varlink.service.varlink; the spec's GetInfo declaration carries none), e.g. 27. (Interfaces themselves have no version numbers; see 'Interface Evolution'.)"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="url" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="&quot;Web URL pointing to additional information about this service&quot; (field comment in systemd's org.varlink.service.varlink; the spec's GetInfo declaration carries none)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="interfaces" upperBound="-1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="&quot;List of interfaces implemented by this service&quot; (field comment in systemd's org.varlink.service.varlink; the spec's GetInfo declaration carries none) as fully-qualified names ('interfaces: []string'); MUST include org.varlink.service."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="StandardError">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Closed documentation set: no feature or parameter is typed by this enumeration; it exists so that generators and bindings have the spec's table as literals. The closed set of generic errors defined by the org.varlink.service interface, 'that may be returned by any method of any interface'. Qualified name: org.varlink.service.&lt;literal>. The HTTP bridge maps them to status codes (see http.HttpBridge.statusForError). A Python binding typically generates one exception class per literal. The org.varlink.service IDL itself is also representable as an ordinary Interface instance (it is in the systemd corpus); this EEnum is the closed set a binding and the bridge mapping need."/>
+      </eAnnotations>
+      <eLiterals name="InterfaceNotFound">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'A method was called on an interface the service does not implement. interface names it.' Parameters: (interface: string). HTTP: 404 Not Found."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="MethodNotFound" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'A method was called that the (known) interface does not define. method names it.' Parameters: (method: string). HTTP: 404 Not Found."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="MethodNotImplemented" value="2">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'The interface defines the method, but this service does not implement it. method names it.' Parameters: (method: string). HTTP: 501 Not Implemented."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="InvalidParameter" value="3">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'One of the passed parameters is invalid (missing, wrong type, unknown, or out of range). parameter names it.' Parameters: (parameter: string). Also the SHOULD response to undeclared fields in calls and to wrong file descriptor counts. HTTP: 400 Bad Request."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="PermissionDenied" value="4">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'The client is denied access to the method or resource.' Parameters: (). HTTP: 403 Forbidden."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="ExpectedMore" value="5">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'The method has to be called with the more flag set, but was not.' Parameters: (). HTTP: 400 Bad Request."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="ExpectedUpgrade" value="6">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'The method has to be called with the upgrade flag set, but was not.' Parameters: (). 'The ExpectedUpgrade error is an addition to the original org.varlink.service interface as published on varlink.org, mirroring ExpectedMore.' HTTP: 400 Bad Request."/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+
+    <!-- Service addresses -->
+    <eClassifiers xsi:type="ecore:EClass" name="ServiceAddress" abstract="true">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Service Addresses': 'Varlink services are accessible through addresses, typically referencing an entrypoint network socket address. They are expressed in URI-like notation. All properties after a ; character SHOULD be ignored by implementations that do not understand them, to allow future extensions.' Support for UNIX sockets is RECOMMENDED, TCP is OPTIONAL; other transports define their own schemes (http.HttpBridgeAddress). The textual form is text() = addressText() + the ';' properties; addressText() is abstract and overridden by every concrete address class (Ecore operation overriding, dispatched polymorphically by the OCL delegate), so new address kinds can be added without touching this class."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="propertiesWellFormed"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="propertiesWellFormed" value="properties->forAll(p | p.size() > 0 and p.indexOf(';') = 0)"/>
+      </eAnnotations>
+      <eOperations name="text" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The full address string in spec notation, including any ';'-separated properties, e.g. unix:/run/org.example.ftl, unix:@org.example.ftl, tcp:[::1]:12345, wss://host:1031/waldo/ws/services/io.systemd.Hostname, unix:/run/x;foo=bar."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="self.addressText() + properties->iterate(p; acc : String = '' | acc + ';' + p)"/>
+        </eAnnotations>
+      </eOperations>
+      <eOperations name="addressText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The address proper without the ';' properties. Abstract: each concrete address class overrides it with its own body (unix:PATH, unix:@NAME, tcp:HOST:PORT, bridge URL)."/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="properties" upperBound="-1" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The ';'-separated properties following the address proper, in order, each without its leading ';' and containing no ';' (the extension mechanism of the address syntax). The spec defines no property syntax or semantics, only that unknown properties SHOULD be ignored; the text is therefore kept opaque."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UnixSocketAddress" abstract="true" eSuperTypes="#//service/ServiceAddress">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="An AF_UNIX stream socket address, 'unix:' followed by either a file system path or '@' and an abstract namespace name. The primary transport on Linux ('Transport: AF_UNIX Stream Sockets')."/>
+      </eAnnotations>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UnixPathAddress" eSuperTypes="#//service/UnixSocketAddress">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec table row 'UNIX socket: unix:/run/org.example.ftl - path of an AF_UNIX socket inode in the file system'. Services SHOULD listen on such a path-bound socket, which is the entrypoint clients connect to; access control is via the socket inode's permissions (connect() needs write access; 0644 rather than 0600 is RECOMMENDED so that unprivileged clients can read the user.varlink xattr)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="pathNotEmpty pathWithoutPropertySeparator"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="pathNotEmpty" value="path &lt;> null and path.size() > 0 and not path.startsWith('@')"/>
+      <details key="pathWithoutPropertySeparator" value="path &lt;> null implies path.indexOf(';') = 0"/>
+      </eAnnotations>
+      <eOperations name="addressText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'unix:' + path."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="'unix:' + path"/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The file system path of the socket inode, e.g. /run/org.example.ftl or /run/systemd/machine/io.systemd.Machine (never starting with '@', which would be the abstract form)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="UnixAbstractAddress" eSuperTypes="#//service/UnixSocketAddress">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec table row 'UNIX abstract namespace socket: unix:@org.example.ftl - Linux abstract socket namespace'. MAY be used, but offers no file-system based access control and is hence not recommended."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="nameNotEmpty nameWithoutPropertySeparator"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="nameNotEmpty" value="name &lt;> null and name.size() > 0"/>
+      <details key="nameWithoutPropertySeparator" value="name &lt;> null implies name.indexOf(';') = 0"/>
+      </eAnnotations>
+      <eOperations name="addressText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'unix:@' + name."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="'unix:@' + name"/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The abstract namespace name following '@', e.g. org.example.ftl."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="TcpAddress" eSuperTypes="#//service/ServiceAddress">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec table rows 'TCP (with hostname) tcp:localhost:12345', 'TCP (with IPv4 address) tcp:127.0.0.1:12345', 'TCP (with IPv6 address) tcp:[::1]:12345'. One class with the host form classified by the derived hostKind; an IPv6 host is stored without the brackets that the textual form requires. 'Support for TCP is OPTIONAL.'"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="portRange hostNotBracketed hostWithoutPropertySeparator hostColonOnlyInIpv6"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="portRange" value="port >= 1 and port &lt;= 65535"/>
+        <details key="hostNotBracketed" value="host &lt;> null and host.size() > 0 and not host.startsWith('[')"/>
+      <details key="hostWithoutPropertySeparator" value="host &lt;> null implies host.indexOf(';') = 0"/>
+      <details key="hostColonOnlyInIpv6" value="host &lt;> null implies (host.indexOf(':') = 0 or host.matches('[0-9A-Fa-f:.]+(%[A-Za-z0-9]+)?'))"/>
+      </eAnnotations>
+      <eOperations name="addressText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'tcp:' + host + ':' + port, with an IPv6 host in brackets."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="'tcp:' + (if hostKind = TcpHostKind::ipv6 then '[' + host + ']' else host endif) + ':' + port.toString()"/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="host" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Hostname, IPv4 address or bare IPv6 address (no brackets)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="port" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="TCP port, 1..65535."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="hostKind" eType="#//service/TcpHostKind" changeable="false" volatile="true" transient="true" derived="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Derived classification of 'host': ipv6 if it contains ':', ipv4 if it is four dotted decimal groups, hostname otherwise."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="derivation" value="if host = null then TcpHostKind::hostname else if host.indexOf(':') > 0 then TcpHostKind::ipv6 else if host.matches('(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])(\\.(25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9]?[0-9])){3}') then TcpHostKind::ipv4 else TcpHostKind::hostname endif endif endif"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="TcpHostKind">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The three host forms of a tcp: address in the spec's address table."/>
+      </eAnnotations>
+      <eLiterals name="hostname">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Hostname and port', e.g. tcp:localhost:12345."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="ipv4" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'IPv4 address and port', e.g. tcp:127.0.0.1:12345."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="ipv6" value="2">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'IPv6 address and port', written in brackets, e.g. tcp:[::1]:12345."/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+
+    <!-- Service registry directory -->
+    <eClassifiers xsi:type="ecore:EClass" name="ServiceRegistry">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Service Registry Directory': 'To allow clients to discover the well-known, public Varlink services available on a system without having to enumerate all socket inodes of the system, services SHOULD bind their entrypoint socket inode inside the /run/varlink/registry/ directory, or place a symlink to it there.' 'Inodes in this directory that neither qualify as socket inodes nor as symlinks to them SHOULD be ignored.' 'Services MAY bind their entrypoint socket outside of the registry, hence clients MUST NOT assume the registry lists all Varlink services available on the system.' The registry complements the user.varlink attribute (transport.SocketInode). A system-wide object independent of any one service, hence a resource root."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="directoryAbsolute entryNamesUnique"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="directoryAbsolute" value="directory &lt;> null and directory.startsWith('/')"/>
+        <details key="entryNamesUnique" value="entries->isUnique(interfaceName)"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="directory" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" defaultValueLiteral="/run/varlink/registry">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The registry directory as an absolute path without trailing slash; the well-known location defined by the spec is /run/varlink/registry (the default)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="entries" upperBound="-1" eType="#//service/RegistryEntry" containment="true" eOpposite="#//service/RegistryEntry/registry">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The socket inodes and symlinks to socket inodes found in the directory, one per well-known interface name (entryNamesUnique, a directory cannot hold two entries of the same name)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="RegistryEntry">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="One entry of the service registry directory: an entrypoint socket inode or a symlink to one. 'Entries in this directory SHOULD be named after the Varlink interface the service implements, e.g. /run/varlink/registry/org.example.ftl for a service implementing the org.example.ftl interface. A service implementing multiple well-known interfaces SHOULD be registered under each of them.'"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="interfaceNameSyntax interfaceMatches targetOnlyForSymlink"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="interfaceNameSyntax" value="interfaceName &lt;> null and interfaceName.matches('[A-Za-z]([-]*[A-Za-z0-9])*(\\.[A-Za-z0-9]([-]*[A-Za-z0-9])*)+')"/>
+        <details key="interfaceMatches" value="interface &lt;> null implies interface.name = interfaceName"/>
+        <details key="targetOnlyForSymlink" value="targetPath &lt;> null implies symlink"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="interfaceName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Entries 'SHOULD be named after the Varlink interface the service implements'; the reference reader (varlinkctl list-registry, systemd 263) skips inodes whose name is not a valid interface name before looking at their type, so interfaceNameSyntax is enforced. The entry's file name, i.e. the fully-qualified name of the interface it advertises."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="symlink" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean" defaultValueLiteral="false">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="True when the entry is a symlink to the entrypoint socket inode bound elsewhere; false when the socket inode itself is bound in the registry."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="targetPath" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="For a symlink entry: the path of the entrypoint socket inode it points to (e.g. /run/systemd/machine/io.systemd.Machine); null otherwise (targetOnlyForSymlink)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="interface" eType="#//Interface">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Optional resolved link to the advertised interface's definition (its name must equal interfaceName)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="service" eType="#//service/Service" eOpposite="#//service/Service/registryEntries">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The service reachable through this entry, if known (non-containment, opposite of Service.registryEntries). EMF serializes both ends of the pair; a hand-written XMI may set the link here or on Service.registryEntries, the loader completes the other end."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="registry" eType="#//service/ServiceRegistry" eOpposite="#//service/ServiceRegistry/entries">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The registry directory containing this entry (opposite of ServiceRegistry.entries)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" changeable="false" volatile="true" transient="true" derived="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Derived: the entry's path, registry.directory + '/' + interfaceName (the spec's default directory when detached), e.g. /run/varlink/registry/org.example.ftl."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="derivation" value="let d : String = (if registry = null or registry.directory = null then '/run/varlink/registry' else registry.directory endif) in (if d.size() > 1 and d.endsWith('/') then d.substring(1, d.size() - 1) else d endif) + '/' + interfaceName"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- ===================================================================== -->
+  <!-- Subpackage transport: socket activation and AF_UNIX socket inodes      -->
+  <!-- ===================================================================== -->
+  <eSubpackages name="transport" nsURI="https://ingi.dk/varlink/transport" nsPrefix="transport">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Spec sections 'Socket Activation' and 'Transport: AF_UNIX Stream Sockets'. Modelled: the socket activation environment and the user.varlink extended attribute roles of socket inodes. Documented only (prose without structure beyond what the Call/Reply model carries): framing (UTF-8 JSON + NUL; buffer and search for NUL, a read() may return part of a message or several; no whitespace outside strings SHOULD be emitted but it MUST be accepted); listening sockets and access control (path-bound entrypoint; connect() needs write access; 0644 rather than 0600 RECOMMENDED); peer authentication (SO_PEERCRED returning UID, GID and PID is RECOMMENDED and cannot be spoofed; SO_PEERPIDFD since Linux 6.5 gives a stable pidfd; credentials are per connection, identify the connecting process, or the bridge when bridged); authorization (e.g. polkit, with a dedicated error when interactive authorization cannot be performed); file descriptor passing (SCM_RIGHTS attached to the sendmsg of the message's first byte, referenced from parameters by 0-based index; interfaces SHOULD document which int fields carry indices; opt-in on both sides, SO_PASSRIGHTS since Linux 6.16; wrong count -> InvalidParameter; bridges MUST NOT silently forward messages referencing dropped fds); protocol upgrade continues on the same socket. Peer credentials and passed file descriptors are deliberately not classes: the protocol is 'intentionally free of such transport-specific side channels' and the IDL has no syntax marking descriptor-carrying fields."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    </eAnnotations>
+    <eClassifiers xsi:type="ecore:EClass" name="SocketActivationEnvironment">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Socket Activation': the systemd socket activation protocol (sd_listen_fds(3)) variables with which a listening or connection socket MAY be passed to a service at startup. File descriptors start at 3. All passed sockets SHOULD be SOCK_STREAM and either listening or established connection sockets. Enables race-free exit-on-idle: with no clients and no background work the service closes the listening socket and exits; the activator queues connections and restarts it."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="listenFdsNonNegative fdNamesMatchCount varlinkSocketNamed fdNamesWithoutColon"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="listenFdsNonNegative" value="listenFds >= 0"/>
+        <details key="fdNamesMatchCount" value="listenFdNames->notEmpty() implies listenFdNames->size() = listenFds"/>
+        <details key="varlinkSocketNamed" value="listenFds > 1 implies listenFdNames->includes('varlink')"/>
+      <details key="fdNamesWithoutColon" value="listenFdNames->forAll(n | n.indexOf(':') = 0)"/>
+      </eAnnotations>
+      <eOperations name="varlinkFileDescriptor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The file descriptor number of the Varlink socket: 3 + the index of the name 'varlink' in LISTEN_FDNAMES, or 3 when exactly one descriptor was passed ('If more than one file descriptor is passed, LISTEN_FDNAMES identifies the Varlink file descriptor'); null when it cannot be determined (several descriptors, none named varlink, or none at all)."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="if listenFdNames->includes('varlink') then 2 + listenFdNames->indexOf('varlink') else if listenFds = 1 then 3 else null endif endif"/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="listenFds" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EInt">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="LISTEN_FDS (e.g. LISTEN_FDS=2): 'Number of file descriptors passed to the service, starting at file descriptor 3. If more than one file descriptor is passed, LISTEN_FDNAMES identifies the Varlink file descriptor.' May be 0 (variable set, nothing passed)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="listenPid" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELongObject">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="LISTEN_PID (e.g. LISTEN_PID=4711): 'The process ID of the started service. If this does not match the PID of the receiving service, the variables MUST be ignored.' Null when unset."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="listenPidfdId" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//ELongObject">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="LISTEN_PIDFDID (e.g. LISTEN_PIDFDID=6783345): 'The inode number of the pidfd referring to the process of the started service (specific to modern Linux). If set and this does not match the pidfd inode ID of the receiving service, the variables MUST be ignored.' Null when unset."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="listenFdNames" upperBound="-1" unique="false" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="LISTEN_FDNAMES split at ':' (e.g. LISTEN_FDNAMES=other:varlink -> ['other','varlink']): 'A colon separated list of names of the passed file descriptors. The Varlink listening socket MUST be named varlink.' Empty when the variable is unset."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="SocketInode">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Recognizing Varlink Socket Inodes': on kernels supporting xattrs on socket inodes (Linux 7.0+), implementations SHOULD tag the AF_UNIX socket inodes they create with the user.varlink extended attribute whose value is the socket's role. Setting it is best-effort; consumers MUST tolerate its absence, SHOULD ignore unknown values, and must not treat it as a security guarantee ('a socket without the attribute may still implement Varlink'). A path-bound listening socket carries two attributes, i.e. two SocketInode objects: 'listen' on the sockfs inode and 'entrypoint' on the file-system inode. Service managers doing socket activation SHOULD set listen/entrypoint (and server) themselves, at allocation time."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="entrypointHasPath sockfsRolesHaveNoPath"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="entrypointHasPath" value="role = SocketRole::entrypoint implies path &lt;> null"/>
+        <details key="sockfsRolesHaveNoPath" value="(role = SocketRole::client or role = SocketRole::server or role = SocketRole::listen) implies path = null"/>
+      </eAnnotations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="attributeValue" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The raw value of the user.varlink extended attribute as read from the inode; null when the attribute is absent, which consumers MUST tolerate. It may be a value outside the four defined roles: 'Unknown values SHOULD be ignored, to allow the definition of further roles in the future' (role is then null). Kept as a string rather than an enum so that absent and unknown values are representable; an unsettable enum would read as its default literal (client) in OCL and in dynamic EMF."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="role" eType="#//transport/SocketRole" changeable="false" volatile="true" transient="true" derived="true">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Derived: the recognised role, i.e. attributeValue mapped onto the four defined values; null when the attribute is absent or carries a value this specification does not define (which consumers SHOULD ignore)."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="derivation" value="if attributeValue = 'client' then SocketRole::client else if attributeValue = 'server' then SocketRole::server else if attributeValue = 'listen' then SocketRole::listen else if attributeValue = 'entrypoint' then SocketRole::entrypoint else null endif endif endif endif"/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="path" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The file-system path of the inode for an entrypoint (the .sun_path of the bound socket); null for anonymous sockfs inodes (client, server, listen), which are visible only via /proc/PID/fd/."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="SocketRole">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The four defined values of the user.varlink extended attribute (ASCII strings, not NUL-terminated). Further roles may be defined in the future; unknown values SHOULD be ignored."/>
+      </eAnnotations>
+      <eLiterals name="client">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Set on the connecting end of a connection, i.e. a socket created via socket() + connect(). Only for inodes on the anonymous socket file system (sockfs).' Set by the client."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="server" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Set on the serving end of a connection, i.e. a socket obtained via accept() on a listening socket. Only for inodes on sockfs.' Set by the service (or the service manager accepting on its behalf)."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="listen" value="2">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Set on a listening socket, i.e. a socket created via socket() + listen(). Only for inodes on sockfs.' Set by the service or the service manager."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="entrypoint" value="3">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Set on the entrypoint socket inode, i.e. the socket node bound into the regular file system that clients connect to. Unlike the other three, this attribute lives on a real file-system inode (not on sockfs) and is hence visible to any process that can resolve the socket path and has read access to it.'"/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+  </eSubpackages>
+
+  <!-- ===================================================================== -->
+  <!-- Subpackage http: the HTTP transport (bridge)                           -->
+  <!-- ===================================================================== -->
+  <eSubpackages name="http" nsURI="https://ingi.dk/varlink/http" nsPrefix="http">
+    <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+      <details key="documentation" value="Spec 'Transport: HTTP': Varlink encapsulated in HTTP, typically by a bridge forwarding to local AF_UNIX services (MAY be implemented by a service directly). Two modes: simple HTTP (one request = one call; body is the parameters object, response the unwrapped output parameters; application/json, or application/json-seq RFC 7464 records when ?more=true streams replies; no oneway/upgrade/pipelining) and WebSocket (.../ws/services/{service}; raw NUL-terminated wire protocol tunneled in binary frames, text frames accepted; bridge re-frames per message until an upgrade is confirmed, then forwards bytes verbatim; Ping/Pong never forwarded; close propagates; no file descriptors, the bridge's AF_UNIX connection MUST NOT accept them). Authentication at the HTTP layer: TLS SHOULD be used; mutual TLS is the one defined mechanism (self-signed server certificates with first-contact pinning allowed). Services behind the bridge see the bridge's peer credentials, so the bridge's own authorization policy has to be relied on. This package holds the bridge (routes, modes, media types, failure and error status tables) and the bridge address form (ws://, wss://, http://, https://) that service.ServiceAddress leaves to the transports."/>
+    </eAnnotations>
+    <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+      <details key="invocationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="settingDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+      <details key="validationDelegates" value="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot"/>
+    </eAnnotations>
+    <eClassifiers xsi:type="ecore:EClass" name="HttpBridge">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="An HTTP bridge: a base URL (all spec routes are relative to it) serving a set of named Varlink services ('The bridge serves a set of Varlink services, each identified by their name'). Encodes the spec's URL schema, error-to-status and failure-to-status tables as operations. A legal resource root (bridge configuration)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="baseUrlSyntax servicesNamed serviceNamesUnique"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="baseUrlSyntax" value="baseUrl &lt;> null and (baseUrl.startsWith('http://') or baseUrl.startsWith('https://')) and baseUrl.endsWith('/')"/>
+        <details key="servicesNamed" value="services->forAll(s | s.name &lt;> null)"/>
+        <details key="serviceNamesUnique" value="services->isUnique(name)"/>
+      </eAnnotations>
+      <eOperations name="statusForError" eType="#//http/HttpStatus">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Spec table 'Varlink error -> HTTP status' for simple HTTP mode: InvalidParameter, ExpectedMore, ExpectedUpgrade -> 400; InterfaceNotFound, MethodNotFound -> 404; MethodNotImplemented -> 501; PermissionDenied -> 403; any other error -> 500. The body is {&quot;error&quot;: &quot;&lt;fully-qualified error name>&quot;, &quot;parameters&quot;: {...}}; 'HTTP status codes only carry the broad classification; clients SHOULD consult the error member of the body for the actual error name.' In streaming mode the status is already 200 when an error record arrives."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="if errorName = 'org.varlink.service.InvalidParameter' or errorName = 'org.varlink.service.ExpectedMore' or errorName = 'org.varlink.service.ExpectedUpgrade' then HttpStatus::badRequest else if errorName = 'org.varlink.service.InterfaceNotFound' or errorName = 'org.varlink.service.MethodNotFound' then HttpStatus::notFound else if errorName = 'org.varlink.service.MethodNotImplemented' then HttpStatus::notImplemented else if errorName = 'org.varlink.service.PermissionDenied' then HttpStatus::forbidden else HttpStatus::internalServerError endif endif endif endif"/>
+        </eAnnotations>
+        <eParameters name="errorName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="The fully-qualified error name of the reply (Reply.error or an ErrorDefinition's qualifiedName)."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eOperations name="statusForFailure" eType="#//http/HttpStatus">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Spec: transport failure -> 502 Bad Gateway (also for a failed WebSocket upgrade); malformed request (invalid JSON body) -> 400; unknown service -> 404; failed authentication -> 401. Body: {&quot;message&quot;: &quot;&lt;human readable message>&quot;}."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="if failure = BridgeFailure::transportFailure then HttpStatus::badGateway else if failure = BridgeFailure::malformedRequest then HttpStatus::badRequest else if failure = BridgeFailure::unknownService then HttpStatus::notFound else HttpStatus::unauthorized endif endif endif"/>
+        </eAnnotations>
+        <eParameters name="failure" lowerBound="1" eType="#//http/BridgeFailure">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="The kind of failure the bridge itself detected."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eOperations name="serviceNameForMethod" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'For .../call/{method}, the service is derived from the method name extracting the interface, i.e. by stripping the last component, e.g. io.systemd.Hostname.Describe is invoked on the service io.systemd.Hostname.' (?service= or the .../call/{service}/{method} form override this.)"/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="if qualifiedMethod = null or qualifiedMethod.lastIndexOf('.') &lt; 2 then null else qualifiedMethod.substring(1, qualifiedMethod.lastIndexOf('.') - 1) endif"/>
+        </eAnnotations>
+        <eParameters name="qualifiedMethod" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="A fully-qualified method name, e.g. io.systemd.Hostname.Describe."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eOperations name="callUrl" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The simple-mode invocation URL baseUrl + 'call/' + method (append ?more=true to stream replies, ?service= to pick a service explicitly)."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="baseUrl + 'call/' + qualifiedMethod"/>
+        </eAnnotations>
+        <eParameters name="qualifiedMethod" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="A fully-qualified method name."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eOperations name="webSocketUrl" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The WebSocket endpoint baseUrl + 'ws/services/' + service."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="baseUrl + 'ws/services/' + serviceName"/>
+        </eAnnotations>
+        <eParameters name="serviceName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+          <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+            <details key="documentation" value="The name of a service served by the bridge."/>
+          </eAnnotations>
+        </eParameters>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="baseUrl" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'All URLs defined here shall be understood relative to a base URL used as service address', e.g. https://host:1031/waldo/ (http or https, ending in '/')."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="authentication" eType="#//http/BridgeAuthentication" defaultValueLiteral="none">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The client authentication mechanism configured on the bridge; authentication happens at the HTTP layer, on the bridge."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EReference" name="services" upperBound="-1" eType="#//service/Service">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The services the bridge serves, each identified by its name (GET .../services lists them; servicesNamed, serviceNamesUnique). Non-containment: the services are described in their own resources."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EClass" name="HttpBridgeAddress" eSuperTypes="#//service/ServiceAddress">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'WebSocket Mode': 'Address URIs of the form ws://host:port/something/ws/services/{service} and wss://host:port/something/ws/services/{service} (and http:///https:// with the same path, implying the WebSocket upgrade) may be used to refer to such remote services.' A local helper establishes the WebSocket and relays the byte stream so that remote services appear like local ones. The base URL (scheme://host:port/basePath) is the bridge's address; the service is reached at basePath + 'ws/services/' + serviceName. Deployments SHOULD use TLS (wss/https)."/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore">
+        <details key="constraints" value="hostNotEmpty basePathSlashes portRange serviceNameWellFormed serviceNameWithoutPropertySeparator"/>
+      </eAnnotations>
+      <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+        <details key="hostNotEmpty" value="host &lt;> null and host.size() > 0"/>
+        <details key="basePathSlashes" value="basePath &lt;> null and basePath.startsWith('/') and basePath.endsWith('/')"/>
+        <details key="portRange" value="port = null or (port >= 1 and port &lt;= 65535)"/>
+        <details key="serviceNameWellFormed" value="serviceName &lt;> null and serviceName.size() > 0 and serviceName.indexOf('/') = 0"/>
+      <details key="serviceNameWithoutPropertySeparator" value="serviceName &lt;> null implies serviceName.indexOf(';') = 0"/>
+      </eAnnotations>
+      <eOperations name="url" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The full URL, e.g. wss://host:1031/waldo/ws/services/io.systemd.Hostname."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="(if scheme = BridgeUrlScheme::ws then 'ws' else if scheme = BridgeUrlScheme::wss then 'wss' else if scheme = BridgeUrlScheme::http then 'http' else 'https' endif endif endif) + '://' + host + (if port = null then '' else ':' + port.toString() endif) + basePath + 'ws/services/' + serviceName"/>
+        </eAnnotations>
+      </eOperations>
+      <eOperations name="addressText" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Overrides ServiceAddress.addressText(): the bridge URL (url())."/>
+        </eAnnotations>
+        <eAnnotations source="http://www.eclipse.org/emf/2002/Ecore/OCL/Pivot">
+          <details key="body" value="self.url()"/>
+        </eAnnotations>
+      </eOperations>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="scheme" lowerBound="1" eType="#//http/BridgeUrlScheme">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="ws, wss, http or https. Required; note that EMF never reports a required enum attribute as unset (an omitted scheme reads as the first literal, ws), so converters and creation tools must always write it."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="host" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The bridge host (hostname or address as it appears in the URL authority)."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="port" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EIntegerObject">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Optional explicit port (the scheme default applies when absent), e.g. 1031."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="basePath" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString" defaultValueLiteral="/">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The path of the bridge's base URL, starting and ending with '/', e.g. /waldo/ (the '/something/' part of the spec's pattern); '/' when the bridge is mounted at the root."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+      <eStructuralFeatures xsi:type="ecore:EAttribute" name="serviceName" lowerBound="1" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="The {service} path segment: the name under which the bridge serves the service, e.g. io.systemd.Hostname."/>
+        </eAnnotations>
+      </eStructuralFeatures>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="BridgeUrlScheme">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="URL schemes accepted for HTTP-bridge service addresses. Deployments SHOULD use TLS (wss / https) unless the network is trusted by construction."/>
+      </eAnnotations>
+      <eLiterals name="ws">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Plain WebSocket."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="wss" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="WebSocket over TLS."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="http" value="2">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="HTTP URL with the same path, implying the WebSocket upgrade."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="https" value="3">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="HTTPS URL with the same path, implying the WebSocket upgrade over TLS."/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="BridgeRoute">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Closed documentation set: no feature or parameter is typed by this enumeration; it exists so that generators and bindings have the spec's table as literals. Spec table 'URL Schema': the routes of the HTTP bridge, relative to the base URL ('...' below)."/>
+      </eAnnotations>
+      <eLiterals name="call">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="POST .../call/{method}: 'Invoke a method. The service is derived from the interface prefix of the method name, or given via ?service='. Body: the input parameters object (not the call object), {} or empty when there are none. Query ?more=true streams replies as application/json-seq."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="callOnService" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="POST .../call/{service}/{method}: 'Invoke a method on an explicitly given service' (e.g. org.varlink.service.GetInfo on io.systemd.Hostname)."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="services" value="2">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="GET .../services: 'List the available services.' Returns {&quot;services&quot;: [&quot;&lt;name>&quot;, ...]}."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="serviceInformation" value="3">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="GET .../services/{service}: 'Service information of one service (as returned by org.varlink.service.GetInfo)', i.e. a service.ServiceInformation object."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="interfaceMethods" value="4">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="GET .../services/{service}/{interface}: 'Method names of one interface implemented by a service.' Returns {&quot;methods&quot;: [&quot;&lt;method>&quot;, ...]} with unqualified names from the interface definition."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="webSocket" value="5">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="GET .../ws/services/{service}: 'WebSocket endpoint tunneling the Varlink wire protocol to a service' (HTTP upgrade per RFC 6455 / 8441 / 9220)."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="health" value="6">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="GET .../health: 'Health check, returns 200 OK if the bridge is operational.'"/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="BridgeMode">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Closed documentation set: no feature or parameter is typed by this enumeration; it exists so that generators and bindings have the spec's table as literals. The two encapsulation modes of the HTTP transport."/>
+      </eAnnotations>
+      <eLiterals name="simple">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Simple HTTP mode in which each HTTP request maps to one Varlink method call.' Request/response bodies are the (unwrapped) parameters objects, application/json; with ?more=true the replies stream as application/json-seq records (0x1E, JSON text, 0x0A; continues is not transmitted, the sequence ends with the body; an error reply or transport failure terminates it with an error record, status stays 200). Limitations: cannot express oneway, upgrade or pipelining."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="webSocket" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'WebSocket mode in which the Varlink wire protocol is tunneled verbatim.' The full protocol is available including oneway, more, upgrade and pipelining; file descriptor passing is not."/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="MediaType">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Closed documentation set: no feature or parameter is typed by this enumeration; it exists so that generators and bindings have the spec's table as literals. The closed set of media types of simple HTTP mode: 'All request bodies in the simple mode are JSON documents with the application/json media type. Response bodies use the application/json media type unless streaming mode is used, in which case application/json-seq is used. Clients SHOULD include application/json or application/json-seq in their requests' Accept header based on the expected response type.' The literal values are the media type strings."/>
+      </eAnnotations>
+      <eLiterals name="applicationJson" literal="application/json">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="application/json: all request bodies and single-reply responses."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="applicationJsonSeq" value="1" literal="application/json-seq">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="application/json-seq (RFC 7464 JSON text sequences): streaming responses of ?more=true requests."/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="BridgeFailure">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Failures the bridge itself reports (as opposed to Varlink errors passed through), each with its HTTP status (HttpBridge.statusForFailure) and a {&quot;message&quot;: ...} body."/>
+      </eAnnotations>
+      <eLiterals name="transportFailure">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'If the bridge cannot connect to the service's socket, or the connection fails while the call is in progress' -> 502 Bad Gateway (also a failed WebSocket upgrade). During streaming the record {&quot;error&quot;: &quot;&lt;message>&quot;} terminates the sequence instead."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="malformedRequest" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Invalid JSON body -> 400 Bad Request."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="unknownService" value="2">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="Unknown service -> 404 Not Found."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="authenticationFailed" value="3">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Requests that fail authentication yield 401 Unauthorized.'"/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="BridgeAuthentication">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="Spec 'Authentication and Transport Security': client authentication mechanisms of the bridge. 'One mechanism is currently defined.' An enum rather than a boolean because the set is closed but extensible."/>
+      </eAnnotations>
+      <eLiterals name="none">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="No client authentication (acceptable only when 'the network is trusted by construction')."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="mutualTls" value="1">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="'Mutual TLS. The bridge is configured with a CA certificate, and requires clients to present a certificate signed by it. Without a configured server certificate the bridge MAY generate a self-signed one, in which case clients SHOULD pin the server's public key on first contact (in the manner of SSH known_hosts), and refuse connections if it later changes.'"/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+    <eClassifiers xsi:type="ecore:EEnum" name="HttpStatus">
+      <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+        <details key="documentation" value="The HTTP status codes the spec assigns to bridge responses; literal values are the numeric codes."/>
+      </eAnnotations>
+      <eLiterals name="ok" value="200">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="200 OK: successful call (unwrapped output parameters, {} if absent), any streaming response once headers are sent, and the health check."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="badRequest" value="400">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="400 Bad Request: InvalidParameter, ExpectedMore, ExpectedUpgrade, or a malformed request body."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="unauthorized" value="401">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="401 Unauthorized: failed authentication."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="forbidden" value="403">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="403 Forbidden: org.varlink.service.PermissionDenied."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="notFound" value="404">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="404 Not Found: InterfaceNotFound, MethodNotFound, or an unknown service."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="internalServerError" value="500">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="500 Internal Server Error: any Varlink error not listed in the mapping table (i.e. interface-specific errors)."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="notImplemented" value="501">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="501 Not Implemented: org.varlink.service.MethodNotImplemented."/>
+        </eAnnotations>
+      </eLiterals>
+      <eLiterals name="badGateway" value="502">
+        <eAnnotations source="http://www.eclipse.org/emf/2002/GenModel">
+          <details key="documentation" value="502 Bad Gateway: the bridge cannot connect to the service's socket or the connection fails mid-call; also a failed WebSocket upgrade."/>
+        </eAnnotations>
+      </eLiterals>
+    </eClassifiers>
+  </eSubpackages>
+</ecore:EPackage>

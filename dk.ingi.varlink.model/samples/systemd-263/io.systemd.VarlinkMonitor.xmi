@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.VarlinkMonitor">
+  <documentation>Monitor Varlink socket traffic via BPF.</documentation>
+  <members xsi:type="varlink:StructDefinition" name="ProcessId">
+    <documentation>An object for referencing UNIX processes</documentation>
+    <body>
+      <fields name="pid">
+        <documentation>Numeric UNIX PID value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="pidfdId">
+        <documentation>64bit inode number of pidfd if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="bootId">
+        <documentation>Boot ID of the system the inode number belongs to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="MonitorFilter">
+    <documentation>A filter for matching varlink traffic.</documentation>
+    <body>
+      <fields name="uid">
+        <documentation>Match traffic where sender or peer has this UID.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="pid">
+        <documentation>Match traffic where sender or peer has this PID.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="path">
+        <documentation>Match traffic on this socket path. Empty string matches sockets without a path.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Acquire" moreSupport="supported">
+    <documentation>Start monitoring varlink traffic with the given filters. Returns a BPF ring buffer fd and keeps the connection open until the client disconnects.</documentation>
+    <input>
+      <fields name="filters">
+        <documentation>Capture filters. Each filter's fields are ANDed; the array is ORed. If unset, captures all traffic.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="MonitorFilter" definition="//@members[name='MonitorFilter']"/>
+        </type>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="ringbufFileDescriptor">
+        <documentation>File descriptor index for the BPF ring buffer.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="BadFilter">
+    <documentation>A filter parameter is invalid.</documentation>
+    <parameters>
+      <fields name="parameter">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+</varlink:Interface>

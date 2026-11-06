@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd">
+  <members xsi:type="varlink:ErrorDefinition" name="Disconnected">
+    <documentation>Local error if a Varlink connection is disconnected (this never crosses the wire and is synthesized locally only).</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TimedOut">
+    <documentation>A method call time-out has been reached (also synthesized locally, does not cross wire)</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="Protocol">
+    <documentation>Some form of protocol error (also synthesized locally, does not cross wire)</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="System">
+    <documentation>A generic Linux system error ("errno"s).</documentation>
+    <parameters>
+      <fields name="origin">
+        <documentation>The origin of this system error, typically 'linux' to indicate Linux error numbers.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="errnoName">
+        <documentation>The Linux error name, i.e. ENOENT, EHWPOISON or similar.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="errno">
+        <documentation>The numeric Linux error number. Typically the name is preferable, if specified.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="OperationNotSupported">
+    <documentation>The method is implemented, but the requested operation is not supported.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

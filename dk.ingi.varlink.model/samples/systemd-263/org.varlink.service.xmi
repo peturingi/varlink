@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="org.varlink.service">
+  <documentation>General Varlink service interface</documentation>
+  <members xsi:type="varlink:Method" name="GetInfo">
+    <documentation>Get service meta information</documentation>
+    <input/>
+    <output>
+      <fields name="vendor">
+        <documentation>String identifying the vendor of this service</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="product">
+        <documentation>String identifying the product implementing this service</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="version">
+        <documentation>Version string of this product</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="url">
+        <documentation>Web URL pointing to additional information about this service</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="interfaces">
+        <documentation>List of interfaces implemented by this service</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetInterfaceDescription">
+    <documentation>Get description of an implemented interface in Varlink IDL format</documentation>
+    <input>
+      <fields name="interface">
+        <documentation>Name of interface to query interface description of</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="description">
+        <documentation>Interface description in Varlink IDL format</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InterfaceNotFound">
+    <documentation>Error returned if a method is called on an unknown interface</documentation>
+    <parameters>
+      <fields name="interface">
+        <documentation>Name of interface that was called but does not exist</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="MethodNotFound">
+    <documentation>Error returned if an unknown method is called on an known interface</documentation>
+    <parameters>
+      <fields name="method">
+        <documentation>Name of method that was called but does not exist</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="MethodNotImplemented">
+    <documentation>Error returned if a method is called that is known but not implemented</documentation>
+    <parameters>
+      <fields name="method">
+        <documentation>Name of method that was called but is not implemented</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InvalidParameter">
+    <documentation>Error returned if a method is called with an invalid parameter</documentation>
+    <parameters>
+      <fields name="parameter">
+        <documentation>Name of the invalid parameter</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="PermissionDenied">
+    <documentation>General permission error</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ExpectedMore">
+    <documentation>A method was called with the 'more' flag off, but it may only be called with the flag turned on</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

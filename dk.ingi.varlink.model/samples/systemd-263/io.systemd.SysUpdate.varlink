@@ -1,0 +1,125 @@
+# APIs to manage system updates
+# [Experimental]
+interface io.systemd.SysUpdate
+
+# Class of a Target.
+type TargetClass(
+	# Container or machine managed by systemd-machined.service(8).
+	machine,
+	# Portable service.
+	portable,
+	# System extension managed by systemd-sysext.service(8).
+	sysext,
+	# Configuration extension managed by systemd-confext.service(8).
+	confext,
+	# Host system.
+	host,
+	# Component managed by systemd-sysupdate.service(8).
+	component
+)
+
+# Action to take after a component has been updated successfully.
+type ComponentSuccessAction(
+	# Continue with the next component
+	continue,
+	# Finish the current update iteration, and start the next one
+	restart
+)
+
+# Action to take if updating a component failed.
+type ComponentFailureAction(
+	# Continue with the next component, but fail at the very end
+	continue,
+	# Fail immediately
+	fail
+)
+
+# Identifier for a component of the system (i.e. the host itself, a sysext, a confext, etc.) that can be updated by systemd-sysupdate(8).
+type TargetIdentifier(
+	# Where the target was enumerated.
+	class: TargetClass,
+	# Name of the target, unique within a class.
+	name: ?string
+)
+
+# Type containing a configured sysupdate target, along with its metadata if it is a component.
+type Target(
+	# Identifier for the target.
+	id: TargetIdentifier,
+	# The currently installed version of the target, if any.
+	currentVersion: ?string,
+	# All locally-known versions of the target.
+	allVersions: ?[]string,
+	# Whether the current version is installed but pending a reboot to become active. Always set when returned by ListTargets(). Not set by component providers, since this is a property of the local installation.
+	currentVersionIsPending: ?bool,
+	# URLs to zero or more AppStream catalog XML files describing the target.
+	appStream: ?[]string,
+	# The following fields carry the metadata of targets of class 'component', mirroring the settings of sysupdate.components(5). They are unset for targets of other classes. A short human readable description of the component.
+	description: ?string,
+	# URLs to documentation for the component.
+	documentation: ?[]string,
+	# Whether the component is enabled. When returned by ListTargets() this is the effective state and always set for components. If unset, the component is enabled.
+	enabled: ?bool,
+	# What to do after the component has been updated successfully, see SuccessAction= in sysupdate.components(5).
+	successAction: ?ComponentSuccessAction,
+	# What to do if updating the component failed, see FailureAction= in sysupdate.components(5).
+	failureAction: ?ComponentFailureAction,
+	# Whether the component is suggested for enablement. When returned by ListTargets() this is the evaluated state and always set for components. If unset, the component is not suggested.
+	suggested: ?bool,
+	# The minimum version to permit for all transfers of the component, see MinVersion= in sysupdate.components(5).
+	minVersion: ?string,
+	# The maximum version to permit for all transfers of the component, see MaxVersion= in sysupdate.components(5).
+	maxVersion: ?string,
+	# Versions to protect from removal for all transfers of the component, see ProtectVersion= in sysupdate.components(5).
+	protectVersion: ?[]string
+)
+
+# Type containing a configured sysupdate feature.
+type Feature(
+	# Identifier for the feature.
+	id: string,
+	# A short human readable description of the feature.
+	description: ?string,
+	# URLs to documentation for the feature.
+	documentation: ?[]string,
+	# URLs to zero or more AppStream catalog XML files describing the feature.
+	appStream: ?[]string,
+	# Whether the feature is enabled.
+	enabled: bool,
+	# Whether the feature is suggested for enablement.
+	suggested: ?bool,
+	# Array of IDs of the transfers (including currently disabled ones) which are controlled by this feature.
+	transfers: ?[]string
+)
+
+# Show optional features
+method ListFeatures(
+	# Target to list features for.
+	target: TargetIdentifier
+) -> (
+	# The configured features.
+	features: []Feature
+)
+
+# Check if there’s a new version available
+method CheckNew(
+	# Target to check for updates for.
+	target: TargetIdentifier,
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool
+) -> (
+	# The version string for the new version which is available.
+	available: string
+)
+
+# Show targets
+method ListTargets() -> (
+	# The configured targets.
+	targets: []Target
+)
+
+# Error indicating that no update is currently available to update to.
+error NoUpdateNeeded()
+
+# Error indicating the specified target doesn’t exist
+error NoSuchTarget()

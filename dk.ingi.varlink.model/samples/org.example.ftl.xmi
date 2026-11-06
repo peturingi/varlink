@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Instance of the spec's example interface org.example.ftl (UAPI.20 'Interface Definition' / 'Example'),
+     hand-written against final/varlink.ecore. Documentation lines are verbatim from the spec, one
+     <documentation> element per '#' line. Named type references carry the raw token (typeName) and the
+     resolved definition as a name-keyed fragment (//@members[name='X'], the form EMF itself writes because
+     Interface.members has eKeys=name). The spec example carries no systemd marker lines, so every method
+     has moreSupport/upgradeSupport = unspecified (the default) and nothing is experimental. -->
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:varlink="https://ingi.dk/varlink" name="org.example.ftl">
+  <documentation>Interface to jump a spacecraft to another point in space.</documentation>
+  <documentation>The FTL Drive is the propulsion system to achieve</documentation>
+  <documentation>faster-than-light travel through space. A ship making a</documentation>
+  <documentation>properly calculated jump can arrive safely in planetary</documentation>
+  <documentation>orbit, or alongside other ships or spaceborne objects.</documentation>
+
+  <!-- type DriveCondition (state: (idle, spooling, busy), tylium_level: int) -->
+  <members xsi:type="varlink:StructDefinition" name="DriveCondition">
+    <documentation>The current state of the FTL drive and the amount of</documentation>
+    <documentation>fuel available to jump.</documentation>
+    <body>
+      <fields name="state">
+        <type xsi:type="varlink:EnumType">
+          <values name="idle"/>
+          <values name="spooling"/>
+          <values name="busy"/>
+        </type>
+      </fields>
+      <fields name="tylium_level">
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+
+  <!-- type DriveConfiguration (speed: int, trajectory: int, duration: int) -->
+  <members xsi:type="varlink:StructDefinition" name="DriveConfiguration">
+    <documentation>Speed, trajectory and jump duration is calculated prior</documentation>
+    <documentation>to activating the FTL drive.</documentation>
+    <body>
+      <fields name="speed"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+      <fields name="trajectory"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+      <fields name="duration"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+    </body>
+  </members>
+
+  <!-- type Coordinate (longitude: float, latitude: float, distance: int) -->
+  <members xsi:type="varlink:StructDefinition" name="Coordinate">
+    <documentation>The galactic coordinates use the Sun as the origin.</documentation>
+    <documentation>Galactic longitude is measured with primary direction</documentation>
+    <documentation>from the Sun to the center of the galaxy in the galactic</documentation>
+    <documentation>plane, while the galactic latitude measures the angle</documentation>
+    <documentation>of the object above the galactic plane.</documentation>
+    <body>
+      <fields name="longitude"><type xsi:type="varlink:BuiltinType" kind="float"/></fields>
+      <fields name="latitude"><type xsi:type="varlink:BuiltinType" kind="float"/></fields>
+      <fields name="distance"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+    </body>
+  </members>
+
+  <!-- method Monitor() -> (condition: DriveCondition) -->
+  <members xsi:type="varlink:Method" name="Monitor">
+    <documentation>Monitor the drive. The method will reply with an update</documentation>
+    <documentation>whenever the drive's state changes</documentation>
+    <input/>
+    <output>
+      <fields name="condition">
+        <type xsi:type="varlink:NamedTypeReference" typeName="DriveCondition" definition="//@members[name='DriveCondition']"/>
+      </fields>
+    </output>
+  </members>
+
+  <!-- method CalculateConfiguration(current: Coordinate, target: Coordinate) -> (configuration: DriveConfiguration) -->
+  <members xsi:type="varlink:Method" name="CalculateConfiguration">
+    <documentation>Calculate the drive's jump parameters from the current</documentation>
+    <documentation>position to the target position in the galaxy</documentation>
+    <input>
+      <fields name="current"><type xsi:type="varlink:NamedTypeReference" typeName="Coordinate" definition="//@members[name='Coordinate']"/></fields>
+      <fields name="target"><type xsi:type="varlink:NamedTypeReference" typeName="Coordinate" definition="//@members[name='Coordinate']"/></fields>
+    </input>
+    <output>
+      <fields name="configuration"><type xsi:type="varlink:NamedTypeReference" typeName="DriveConfiguration" definition="//@members[name='DriveConfiguration']"/></fields>
+    </output>
+  </members>
+
+  <!-- method Jump(configuration: DriveConfiguration) -> () -->
+  <members xsi:type="varlink:Method" name="Jump">
+    <documentation>Jump to the calculated point in space</documentation>
+    <input>
+      <fields name="configuration"><type xsi:type="varlink:NamedTypeReference" typeName="DriveConfiguration" definition="//@members[name='DriveConfiguration']"/></fields>
+    </input>
+    <output/>
+  </members>
+
+  <!-- error NotEnoughEnergy () -->
+  <members xsi:type="varlink:ErrorDefinition" name="NotEnoughEnergy">
+    <documentation>There is not enough tylium to jump with the given</documentation>
+    <documentation>parameters</documentation>
+    <parameters/>
+  </members>
+
+  <!-- error ParameterOutOfRange (field: string) -->
+  <members xsi:type="varlink:ErrorDefinition" name="ParameterOutOfRange">
+    <documentation>The supplied parameters are outside the supported range</documentation>
+    <parameters>
+      <fields name="field"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+    </parameters>
+  </members>
+</varlink:Interface>

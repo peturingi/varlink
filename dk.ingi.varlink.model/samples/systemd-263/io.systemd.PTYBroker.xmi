@@ -1,0 +1,475 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.PTYBroker">
+  <documentation>An API for acquiring a pseudo-terminal</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="FrontendType">
+    <documentation>What to do with the PTY frontend.</documentation>
+    <body>
+      <values name="take">
+        <documentation>Return the file descriptor of the frontend side of the pty to the caller, do not keep a duplicate.</documentation>
+      </values>
+      <values name="null">
+        <documentation>Read any data received from the backend and send it to monitors, afterwards discard it</documentation>
+      </values>
+      <values name="log">
+        <documentation>Read any data received from the backend and write it to monitors and the logs</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="BackendType">
+    <documentation>What to do with the PTY backend.</documentation>
+    <body>
+      <values name="take">
+        <documentation>Return the file descriptor of the backend side of the pty to the caller, do not keep a duplicate.</documentation>
+      </values>
+      <values name="shell">
+        <documentation>Invoke a shell on the backend side.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="TerminalSettings">
+    <documentation>Details about terminal settings.</documentation>
+    <body>
+      <fields name="envTERM">
+        <documentation>Terminal type ($TERM)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="envCOLORTERM">
+        <documentation>Terminal type ($COLORTERM)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="envNO_COLOR">
+        <documentation>Whether $NO_COLOR is set to a non-empty value, i.e. color output shall be suppressed (see no-color.org)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="columns">
+        <documentation>Width (in character cell columns) for the pty</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="lines">
+        <documentation>Height (in character cell lines) for the pty</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="WorkingDirectory">
+    <documentation>The working directory of the shell.</documentation>
+    <body>
+      <fields name="path">
+        <documentation>The path to the working directory. Mutually exclusive with 'home'</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="home">
+        <documentation>If true, use the configured user's home directory as the working directory. Mutually exclusive with 'path'</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="missingOK">
+        <documentation>Whether the path to the working directory is allowed to not exist</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ProcessId">
+    <documentation>An object for referencing UNIX processes</documentation>
+    <body>
+      <fields name="pid">
+        <documentation>Numeric UNIX PID value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="pidfdId">
+        <documentation>64bit inode number of pidfd if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="bootId">
+        <documentation>Boot ID of the system the inode number belongs to</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="AcquirePty" upgradeSupport="supported">
+    <documentation>Allocates a PTY pair, and configures what to do with each side.</documentation>
+    <input>
+      <fields name="frontendType">
+        <documentation>What to do with the 'frontend' of the pty, also known as the pty 'master'</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FrontendType" definition="//@members[name='FrontendType']"/>
+      </fields>
+      <fields name="backendType">
+        <documentation>What to do with the 'backend' of the pty, also known the pty 'slave'</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BackendType" definition="//@members[name='BackendType']"/>
+      </fields>
+      <fields name="name">
+        <documentation>A unique name to identify the pty allocation with</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="description">
+        <documentation>A descriptive string to identify the pty allocation with (doesn't have to be unique)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="tag">
+        <documentation>The syslog 'tag' to use for this pseudo TTY output when connected to logging</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="user">
+        <documentation>For shell backend: user to run the shell as</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="group">
+        <documentation>For shell backend: group to run the shell as</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="workingDirectory">
+        <documentation>For shell backend: initial directory for the shell, either an absolute path or the home directory of the user</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="WorkingDirectory" definition="//@members[name='WorkingDirectory']" nullable="true"/>
+      </fields>
+      <fields name="environment">
+        <documentation>For shell backend: environment variables for the shell, as a list of assignments in the usual VAR=VALUE syntax</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="lightweight">
+        <documentation>For shell backend: whether to allocate a 'lightweight' session</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="commandLine">
+        <documentation>For shell backend: command line to invoke as main service process. If unset an interactive login shell is invoked.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="viaShell">
+        <documentation>For shell backend: whether to invoke the command line via the target user's native shell. Defaults to true. If false a command line must be specified, and is invoked directly.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="executable">
+        <documentation>For shell backend: absolute path of the binary to execute. Only valid if viaShell is false. If unset the first element of the command line is used, otherwise the first element of the command line is only passed as argv[0] (e.g. to request login shell semantics by prefixing it with a dash).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="monitor">
+        <documentation>Convert the connection into a monitor connection once done</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="hangUpOnDisconnect">
+        <documentation>If true, hang up the pty once this monitor connection is disconnected. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="ignoreHangup">
+        <documentation>If true, a hangup of the backend side of the pty (e.g. because the last process having it open closed it, or called vhangup() on it) does not release the pty, since the backend might be reopened later. Only valid in combination with the monitor and hangUpOnDisconnect flags, as the monitor connection going away then defines the lifetime of the pty. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="osc2811">
+        <documentation>If true, track the dimensions of the monitor's terminal via OSC 2811 sequences on the monitor stream, and propagate the minimum dimensions of all monitors to the pty. Only valid in combination with the monitor flag. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>Initial settings for the terminal</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Selected name for the pty allocation</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="description">
+        <documentation>A descriptive string to identify the pty allocation with (doesn't have to be unique)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="frontendType">
+        <documentation>The frontend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FrontendType" definition="//@members[name='FrontendType']"/>
+      </fields>
+      <fields name="backendType">
+        <documentation>The backend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BackendType" definition="//@members[name='BackendType']"/>
+      </fields>
+      <fields name="tag">
+        <documentation>The syslog 'tag' to use for this pseudo TTY output when connected to logging</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="frontendFileDescriptor">
+        <documentation>The index of the PTY frontend (i.e. 'master')</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="backendFileDescriptor">
+        <documentation>The index of the PTY backend (i.e. 'slave')</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="backendPath">
+        <documentation>The TTY path name of the allocate pseudo TTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="unit">
+        <documentation>The name of the transient service unit that runs the shell or login on the PTY backend side.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>Settled settings for the terminal</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="EnrollPty" upgradeSupport="supported">
+    <documentation>Enrolls a pre-allocated PTY frontend (i.e. the master).</documentation>
+    <input>
+      <fields name="frontendFileDescriptor">
+        <documentation>The index of the PTY frontend (i.e. 'master')</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="frontendType">
+        <documentation>What to do with the 'frontend' of the pty, also known as the pty 'master'</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FrontendType" definition="//@members[name='FrontendType']"/>
+      </fields>
+      <fields name="backendPath">
+        <documentation>The TTY path name of the pre-allocated pseudo TTY, if known and meaningful to the broker. Leave unset if the path only makes sense within the caller's namespace.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <documentation>A unique name to identify the pty allocation with</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="description">
+        <documentation>A descriptive string to identify the pty allocation with (doesn't have to be unique)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="tag">
+        <documentation>The syslog 'tag' to use for this pseudo TTY output when connected to logging</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="monitor">
+        <documentation>Convert the connection into a monitor connection once done</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="hangUpOnDisconnect">
+        <documentation>If true, hang up the pty once this monitor connection is disconnected. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="ignoreHangup">
+        <documentation>If true, a hangup of the backend side of the pty (e.g. because the last process having it open closed it, or called vhangup() on it) does not release the pty, since the backend might be reopened later. Only valid in combination with the monitor and hangUpOnDisconnect flags, as the monitor connection going away then defines the lifetime of the pty. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="osc2811">
+        <documentation>If true, track the dimensions of the monitor's terminal via OSC 2811 sequences on the monitor stream, and propagate the minimum dimensions of all monitors to the pty. Only valid in combination with the monitor flag. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>Initial settings for the terminal</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Selected name for the pty allocation</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="description">
+        <documentation>A descriptive string to identify the pty allocation with (doesn't have to be unique)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="frontendType">
+        <documentation>The frontend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FrontendType" definition="//@members[name='FrontendType']"/>
+      </fields>
+      <fields name="backendType">
+        <documentation>The backend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BackendType" definition="//@members[name='BackendType']"/>
+      </fields>
+      <fields name="tag">
+        <documentation>The syslog 'tag' to use for this pseudo TTY output when connected to logging</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>Settled settings for the terminal</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="MonitorPty" upgradeSupport="required">
+    <documentation>Monitor frontend side of the pty.</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of the PTY allocation to connect to.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="trackBufferLines">
+        <documentation>How many lines of track buffer to return. If null defaults to 0.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="hangUpOnDisconnect">
+        <documentation>If true, hang up the pty once this monitor connection is disconnected. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="osc2811">
+        <documentation>If true, track the dimensions of the monitor's terminal via OSC 2811 sequences on the monitor stream, and propagate the minimum dimensions of all monitors to the pty. If null defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>New settings for the terminal (not that the environment based settings will not be propagated to the backend processes)</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Name of the allocated PTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="description">
+        <documentation>A descriptive string to identify the pty allocation with (doesn't have to be unique)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="frontendType">
+        <documentation>The frontend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FrontendType" definition="//@members[name='FrontendType']"/>
+      </fields>
+      <fields name="backendType">
+        <documentation>The backend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BackendType" definition="//@members[name='BackendType']"/>
+      </fields>
+      <fields name="tag">
+        <documentation>The syslog 'tag' to use for this pseudo TTY output when connected to logging</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="backendPath">
+        <documentation>The TTY path name of the allocate pseudo TTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="unit">
+        <documentation>The unit backing the PTY if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="trackBuffer">
+        <documentation>Current contents of the track buffer, line by line.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>Settings for the terminal</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ConfigurePty">
+    <documentation>Reconfigure pseudo terminal</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of the PTY allocation to reconfigure to.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="terminalSettings">
+        <documentation>New settings for the terminal (not that the environment based settings will not be propagated to the backend processes)</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="terminalSettings">
+        <documentation>Complete configured settings</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TerminalSettings" definition="//@members[name='TerminalSettings']" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListPty" moreSupport="supported">
+    <documentation>List allocated pseudo-terminals</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of the PTY allocation to list.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Name of the allocated PTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="description">
+        <documentation>A descriptive string to identify the pty allocation with (doesn't have to be unique)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="frontendType">
+        <documentation>The frontend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="FrontendType" definition="//@members[name='FrontendType']"/>
+      </fields>
+      <fields name="backendType">
+        <documentation>The backend type for this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BackendType" definition="//@members[name='BackendType']"/>
+      </fields>
+      <fields name="tag">
+        <documentation>The syslog 'tag' to use for this pseudo TTY output when connected to logging</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="backendPath">
+        <documentation>The backend path for this PTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="unit">
+        <documentation>The unit backing the PTY if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="owner">
+        <documentation>The process of the client that allocated this PTY</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProcessId" definition="//@members[name='ProcessId']" nullable="true"/>
+      </fields>
+      <fields name="ownerUID">
+        <documentation>The UID of the client that allocated this PTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="ownerGID">
+        <documentation>The GID of the client that allocated this PTY</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="HangUpPty">
+    <documentation>Hang up pseudo terminal</documentation>
+    <input>
+      <fields name="name">
+        <documentation>Name of the allocated PTY to hang up</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchPty">
+    <documentation>No PTY by the given name known</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="PtyExists">
+    <documentation>A PTY by the given name already exists.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TooManyPtys">
+    <documentation>Limit on number of PTYs reached.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TooManyMonitors">
+    <documentation>Limit on number of monitors of a PTY reached.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TrackingNotEnabled">
+    <documentation>Tracking of PTY state not enabled for specified PTY.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

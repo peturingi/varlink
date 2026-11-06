@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.MachineImage">
+  <members xsi:type="varlink:EnumDefinition" name="AcquireMetadata">
+    <documentation>A enum field allowing to gracefully get metadata</documentation>
+    <body>
+      <values name="no">
+        <documentation>Do not include metadata in the output</documentation>
+      </values>
+      <values name="yes">
+        <documentation>Include metadata in the output</documentation>
+      </values>
+      <values name="graceful">
+        <documentation>Include metadata in the output, but gracefully eat up errors</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="CleanPoolMode">
+    <documentation>A enum field allowing to control what type of images are cleaned up</documentation>
+    <body>
+      <values name="all">
+        <documentation>Remove all unused images</documentation>
+      </values>
+      <values name="hidden">
+        <documentation>Remove only hidden images</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="List" moreSupport="supported">
+    <documentation>List images</documentation>
+    <input>
+      <fields name="name">
+        <documentation>If non-null the name of a image to report details on.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="acquireMetadata">
+        <documentation>If true the output will include image metadata fields such as 'machineInfo' and 'OSRelease'.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="AcquireMetadata" definition="//@members[name='AcquireMetadata']" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Name of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="path">
+        <documentation>The file system path where image is stored</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <documentation>The type of this image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="class">
+        <documentation>The class of this image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Whether the image is read-only</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="creationTimestamp">
+        <documentation>The image creation timestamp</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="modificationTimestamp">
+        <documentation>The image creation timestamp</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="usage">
+        <documentation>The image creation timestamp</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="usageExclusive">
+        <documentation>The image disk usage (exclusive)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="limit">
+        <documentation>The image disk usage (exclusive)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="limitExclusive">
+        <documentation>The image disk usage limit (exclusive)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="hostname">
+        <documentation>The hostname of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="machineId">
+        <documentation>The machine ID of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="machineInfo">
+        <documentation>Machine info information of an image. It contains an array of key value pairs read from the machine-info(5) file in the image.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="OSRelease">
+        <documentation>OS release information of an image. It contains an array of key value pairs read from the os-release(5) file in the image.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Update">
+    <documentation>Update image allowing to rename, toggle read-only flag, or set a limit</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of an image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="newName">
+        <documentation>If non-null the new name of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>If non-null value of the read-only flag of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="limit">
+        <documentation>If non-null value of image quota limit</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Clone">
+    <documentation>Clone image</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of an image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="newName">
+        <documentation>The new name of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>If non-null value of the read-only flag of the image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Remove">
+    <documentation>Remove image</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of an image</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetPoolLimit">
+    <documentation>Sets an overall quota limit on the pool of images</documentation>
+    <input>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="limit">
+        <documentation>New image quota limit</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="CleanPool" moreSupport="required">
+    <documentation>Clean unused images depending on the specified mode. Note that it does not process vendon and host images.</documentation>
+    <input>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="mode">
+        <documentation>Allows removing all or only hidden images</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="CleanPoolMode" definition="//@members[name='CleanPoolMode']"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>Image name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="usageExclusive">
+        <documentation>The image disk usage (exclusive)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchImage">
+    <documentation>No matching image exists</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TooManyOperations">
+    <documentation>Too many ongoing background operations</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NotSupported">
+    <documentation>Requested operation is not supported</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

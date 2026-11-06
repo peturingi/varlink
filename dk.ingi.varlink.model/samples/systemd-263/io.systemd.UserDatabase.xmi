@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.UserDatabase">
+  <documentation>APIs for querying user and group records.</documentation>
+  <members xsi:type="varlink:Method" name="GetUserRecord" moreSupport="supported">
+    <documentation>Retrieve one or more user records. Look-up is either keyed by UID or user name, or if neither is specified all known records are enumerated.</documentation>
+    <input>
+      <fields name="uid">
+        <documentation>The numeric 32bit UNIX UID of the record, if look-up by UID is desired.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="userName">
+        <documentation>The UNIX user name of the record, if look-up by name is desired.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fuzzyNames">
+        <documentation>The userdb provider service to search on. Must be set to the base name of the userdb entrypoint socket. This is necessary in order to support services that implement multiple userdb services on the same socket.</documentation>
+        <documentation>Names to search for in a fuzzy fashion.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="dispositionMask">
+        <documentation>User dispositions to limit search by.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="uidMin">
+        <documentation>Minimum UID to restrict search too.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="uidMax">
+        <documentation>Maximum UID to restrict search too.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="uuid">
+        <documentation>The UUID to restrict search to.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="service">
+        <documentation>The userdb provider to search on. Must be set to the name of the userdb entrypoint socket. This is necessary in order to support services that implement multiple userdb services on the same socket.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="record">
+        <documentation>The retrieved user record.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="object"/>
+      </fields>
+      <fields name="incomplete">
+        <documentation>If set to true, indicates that the user record is not complete, i.e. that the 'privileged' section has been stripped because the client lacks the privileges to access it.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetGroupRecord" moreSupport="supported">
+    <documentation>Retrieve one or more group records. Look-up is either keyed by GID or group name, or if neither is specified all known records are enumerated.</documentation>
+    <input>
+      <fields name="gid">
+        <documentation>The numeric 32bit UNIX GID of the record, if look-up by GID is desired.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="groupName">
+        <documentation>The UNIX group name of the record, if look-up by name is desired.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fuzzyNames">
+        <documentation>The userdb provider service to search on. Must be set to the base name of the userdb entrypoint socket. This is necessary in order to support services that implement multiple userdb services on the same socket.</documentation>
+        <documentation>Additional names to search for in a fuzzy fashion.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="dispositionMask">
+        <documentation>Group dispositions to limit search by.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="gidMin">
+        <documentation>Minimum GID to restrict search too.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="gidMax">
+        <documentation>Maximum GID to restrict search too.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="uuid">
+        <documentation>The UUID to restrict search to.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="service">
+        <documentation>The userdb provider to search on. Must be set to the name of the userdb entrypoint socket. This is necessary in order to support services that implement multiple userdb services on the same socket.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="record">
+        <documentation>The retrieved group record.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="object"/>
+      </fields>
+      <fields name="incomplete">
+        <documentation>If set to true, indicates that the group record is not complete, i.e. that the 'privileged' section has been stripped because the client lacks the privileges to access it.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetMemberships" moreSupport="supported">
+    <documentation>Retrieve membership relationships between users and groups.</documentation>
+    <input>
+      <fields name="userName">
+        <documentation>The UNIX user name of the user to search for memberships for.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="groupName">
+        <documentation>The UNIX group name of the group to search for memberships for.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="service">
+        <documentation>The userdb provider to search on. Must be set to the base name of the userdb entrypoint socket. This is necessary in order to support services that implement multiple userdb services on the same socket.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="userName">
+        <documentation>The UNIX user name of a discovered membership relationship.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="groupName">
+        <documentation>The UNIX group name of a discovered membership relationship.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoRecordFound">
+    <documentation>Error indicating that no matching user or group record was found.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="BadService">
+    <documentation>Error indicating that the contacted service does not implement the specified service name.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ServiceNotAvailable">
+    <documentation>Error indicating that the backing service currently is not operational and no answer can be provided.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ConflictingRecordFound">
+    <documentation>Error indicating that there's a user record matching either UID/GID or the user/group name, but not both at the same time.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NonMatchingRecordFound">
+    <documentation>Error indicating that there's a user record matching the primary UID/GID or user/group, but that doesn't match the additional specified matches.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="EnumerationNotSupported">
+    <documentation>Error indicating that retrieval of user/group records on this service is only supported if either user/group name or UID/GID are specified, but not if nothing is specified.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

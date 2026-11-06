@@ -1,0 +1,31 @@
+interface io.systemd.Resolve.Link
+
+# DNS server configuration input.
+type DNSServerContext(
+	# IPv4 or IPv6 address of the server.
+	address: []int,
+	# Address family of the server, one of AF_INET or AF_INET6.
+	family: int,
+	# Port number of the server.
+	port: ?int,
+	# Interface index for which this server is configured.
+	ifindex: ?int,
+	# Server Name Indication (SNI) of the server.
+	name: ?string
+)
+
+# Set the per-link DNS server list.
+method SetDNS(
+	# Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.
+	allowInteractiveAuthentication: ?bool,
+	# Index of the interface to configure.
+	ifindex: int,
+	# DNS servers to configure on the link
+	servers: []DNSServerContext
+) -> ()
+
+# The specified interface is managed by systemd-networkd. The request should be re-directed to systemd-networkd.
+error ManagedByNetworkd()
+
+# The specified interface is a loopback interface, and cannot be configured.
+error IsLoopback()

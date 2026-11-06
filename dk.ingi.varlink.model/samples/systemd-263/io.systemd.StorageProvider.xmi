@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.StorageProvider">
+  <documentation>Storage Provider API, a generic interface for acquiring access to storage volumes</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="VolumeType">
+    <documentation>Encodes three classes of storage volumes. This follows the kernel's nomenclature for inode types, i.e. reg, dir, blk.</documentation>
+    <body>
+      <values name="blk">
+        <documentation>Block device storage volumes, block-addressable</documentation>
+      </values>
+      <values name="reg">
+        <documentation>Regular file storage volumes, byte-addressable</documentation>
+      </values>
+      <values name="dir">
+        <documentation>POSIX file system storage volumes, path/offset-addressable</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="CreateMode">
+    <documentation>Determines whether to open existing or create a new storage volume.</documentation>
+    <body>
+      <values name="any">
+        <documentation>Open if exists already, create if missing</documentation>
+      </values>
+      <values name="new">
+        <documentation>Create if missing, fail if exists already</documentation>
+      </values>
+      <values name="open">
+        <documentation>Open if exists already, fail if missing</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Acquire">
+    <documentation>Acquires a file descriptor for a storage volume.</documentation>
+    <input>
+      <fields name="name">
+        <documentation>The name of the storage volume to acquire</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="createMode">
+        <documentation>Determines whether to open or create a storage volume</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="CreateMode" definition="//@members[name='CreateMode']" nullable="true"/>
+      </fields>
+      <fields name="template">
+        <documentation>The template to use when creating a new storage volume</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Controls read/write access to the storage volume. If false and the storage volume cannot be opened in writable mode the call will fail. If null, storage volume will be acquired in writable mode if possible, read-only otherwise. If true, storage volume will be opened in read-only mode (and fail if that's not possible).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="requestAs">
+        <documentation>Dictates what kind of storage volume to request. Some storage volumes can be acquired either as regular file or as block device. In all other cases if this value doesn't match the volume type, the request will fail.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="VolumeType" definition="//@members[name='VolumeType']" nullable="true"/>
+      </fields>
+      <fields name="createSizeBytes">
+        <documentation>The size of the storage volume, if one is created. Has no effect if no storage volume is created.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="fileDescriptorIndex">
+        <documentation>Returns an index into the array of file descriptors associated with this reply. This may be used to get the file descriptor of the volume. The file descriptor must be properly opened, i.e. not an O_PATH file descriptor.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="type">
+        <documentation>The storage volume type, i.e. ultimately the inode type of the returned file descriptor</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="VolumeType" definition="//@members[name='VolumeType']"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Whether storage volume has been opened in read-only mode</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="baseUID">
+        <documentation>Base UID for the returned file descriptor (if directory). If not specified shall default to 0.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="baseGID">
+        <documentation>Base GID for the returned file descriptor (if directory). If not specified shall default to 0.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListVolumes" moreSupport="required">
+    <documentation>Lists available storage volumes.</documentation>
+    <input>
+      <fields name="matchName">
+        <documentation>Specifies a shell glob to filter enumeration by</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>The storage volume's primary name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="aliases">
+        <documentation>Additional names</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="type">
+        <documentation>The type of the storage volume</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="VolumeType" definition="//@members[name='VolumeType']"/>
+      </fields>
+      <fields name="readOnly">
+        <documentation>Whether the storage volume is read-only.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="sizeBytes">
+        <documentation>Size in bytes, if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="usedBytes">
+        <documentation>Used bytes, if known</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListTemplates" moreSupport="required">
+    <documentation>Lists available templates.</documentation>
+    <input>
+      <fields name="matchName">
+        <documentation>Specifies a shell glob to filter enumeration by</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="name">
+        <documentation>The template's name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="type">
+        <documentation>The type of the storage volumes defined by this template</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="VolumeType" definition="//@members[name='VolumeType']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchVolume">
+    <documentation>No storage volume under the specified name exists.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="VolumeExists">
+    <documentation>A storage volume under the specified name already exists.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchTemplate">
+    <documentation>No template under the specified name exists.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="TypeNotSupported">
+    <documentation>The specified volume type is not supported by this backend or system.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="WrongType">
+    <documentation>The volume's type does not match the requested volume type.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="CreateNotSupported">
+    <documentation>This backend does not support storage volume creation of the requested type.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="CreateSizeRequired">
+    <documentation>This backend or selected volume type requires a storage volume size to be specified if the storage volume does not exist yet and needs to be created.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ReadOnlyVolume">
+    <documentation>A storage volume was to be acquired in writable mode, but only read-only access is permitted.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="BadTemplate">
+    <documentation>Template not suitable for this storage volume type.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

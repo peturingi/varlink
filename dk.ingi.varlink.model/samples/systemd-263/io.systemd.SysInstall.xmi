@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.SysInstall">
+  <documentation>API for installing the OS to another block device.</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="ProgressPhase">
+    <documentation>Progress phase identifiers. Note that we might add more phases here, and thus identifiers. Frontends can choose to display the phase to the user in some human readable form, or not do that, but if they do it and they receive a notification for a so far unknown phase, they should just ignore it.</documentation>
+    <body>
+      <values name="encrypt_credentials"/>
+      <values name="install_partitions"/>
+      <values name="mount_partitions"/>
+      <values name="install_kernel"/>
+      <values name="install_bootloader"/>
+      <values name="unmount_partitions"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="DeviceFit">
+    <documentation>Description about the fit of an OS on a block device.</documentation>
+    <body>
+      <values name="enough_free_space"/>
+      <values name="insufficient_free_space"/>
+      <values name="disk_too_small"/>
+      <values name="conflicting_disk_label_present"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="BlockDeviceAction">
+    <documentation>Discriminator on streamed ListCandidateDevices replies in subscribe mode.</documentation>
+    <body>
+      <values name="add">
+        <documentation>The device is currently present and a candidate. Emitted both during the initial enumeration and for live uevents (any action other than 'remove' is propagated as 'add', including the synthesized transitions when a device becomes empty or read-only and a relevant ignore* input is in effect).</documentation>
+      </values>
+      <values name="remove">
+        <documentation>The device is no longer a candidate, either because the kernel reported a remove event, or because a dynamic filter (ignoreEmpty/ignoreReadOnly) flipped it out of the candidate set. Clients should drop the device identified by 'node'. It is permitted (and harmless) to receive a 'remove' for a device the client never saw an 'add' for; clients should ignore these silently.</documentation>
+      </values>
+      <values name="ready">
+        <documentation>Sentinel sent exactly once in subscribe mode, after the initial enumeration is complete. Everything that follows reflects live uevents. Carries no other fields.</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Credential">
+    <documentation>A credential to install to target OS.</documentation>
+    <body>
+      <fields name="id">
+        <documentation>The id of the credential.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="value">
+        <documentation>The value of the credential in base64 encoding.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Run" moreSupport="supported">
+    <documentation>Invoke the actual installation of the OS. If invoked with 'more' enabled will report progress, otherwise will just report completion.</documentation>
+    <input>
+      <fields name="node">
+        <documentation>Full path to the block device node to operate on.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="definitions">
+        <documentation>Path to directory containing definition files.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="erase">
+        <documentation>If true, fully erase the target block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="variables">
+        <documentation>If true, EFI variables are modified to register the installed boot loader in the firmware's boot options database.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="kernelImagePath">
+        <documentation>The path to a kernel image, if missing the current kernel is detected and used.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="copyLocale">
+        <documentation>If true, the current locale is copied to target system</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="copyKeymap">
+        <documentation>If true, the current keymap is copied to target system</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="copyTimezone">
+        <documentation>If true, the current timezone is copied to target system</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="credentials">
+        <documentation>A list of credentials to be installed to target system.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Credential" definition="//@members[name='Credential']"/>
+        </type>
+      </fields>
+    </input>
+    <output>
+      <fields name="phase">
+        <documentation>If used with the 'more' flag, a phase identifier is sent in progress updates.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ProgressPhase" definition="//@members[name='ProgressPhase']" nullable="true"/>
+      </fields>
+      <fields name="object">
+        <documentation>If used with the 'more' flag, an object identifier string is sent in progress updates.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="progress">
+        <documentation>If used with the 'more' flag, a progress percentage (specific to the work done for the specified phase+object is sent in progress updates).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListCandidateDevices" moreSupport="required">
+    <documentation>Return a list of candidate block devices, i.e. that support partition scanning and other requirements for successful operation.</documentation>
+    <input>
+      <fields name="definitions">
+        <documentation>Path to directory containing definition files, used to evaluate the fit of the target OS for each block device.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="subscribe">
+        <documentation>If true, keep the call open after the initial enumeration and stream live add/remove notifications as block-subsystem uevents arrive. The end of the initial enumeration is marked by exactly one notification with action='ready' and no other fields. Defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="action">
+        <documentation>Discriminator field. Only set in subscribe mode. 'add' carries the full device record, 'remove' carries only node, 'ready' carries no other fields and is sent once after the initial enumeration.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="BlockDeviceAction" definition="//@members[name='BlockDeviceAction']" nullable="true"/>
+      </fields>
+      <fields name="node">
+        <documentation>The device node path of the block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="symlinks">
+        <documentation>List of symlinks pointing to the device node, if any.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="diskseq">
+        <documentation>The Linux kernel disk sequence number identifying the medium.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="sizeBytes">
+        <documentation>The size of the block device in bytes.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="vendor">
+        <documentation>The device vendor string if known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="model">
+        <documentation>The device model string if known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="subsystem">
+        <documentation>The subsystem the block device belongs to if known.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fit">
+        <documentation>The fit indicating whether the OS would have enough available space on the device.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="DeviceFit" definition="//@members[name='DeviceFit']" nullable="true"/>
+      </fields>
+      <fields name="minimalSizeBytes">
+        <documentation>Minimal size of the disk required for the installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="needFreeBytes">
+        <documentation>Additional free space needed for the installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="currentSizeBytes">
+        <documentation>Current allocated size of this block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="ConflictingDiskLabelPresent">
+    <documentation>An incompatible disk label present, and not told to erase it.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InsufficientFreeSpace">
+    <documentation>The target disk has insufficient free space to fit all requested partitions. (But the disk would fit, if emptied.)</documentation>
+    <parameters>
+      <fields name="minimalSizeBytes">
+        <documentation>Minimal size of the disk required for the installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="needFreeBytes">
+        <documentation>Additional free space needed on the selected disk.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="currentSizeBytes">
+        <documentation>Size of the selected block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="DiskTooSmall">
+    <documentation>The target disk is too small to fit the installation. (Regardless if emptied or not.)</documentation>
+    <parameters>
+      <fields name="minimalSizeBytes">
+        <documentation>Minimal size of the disk required for the installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="currentSizeBytes">
+        <documentation>Actual size of the selected block device.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </parameters>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoCandidateDevices">
+    <documentation>Not a single candidate block device could be found.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

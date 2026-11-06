@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Resolve.Hook">
+  <documentation>Generic interface for implementing a domain name resolution hook.</documentation>
+  <members xsi:type="varlink:StructDefinition" name="Answer">
+    <documentation>Encapsulates a positive lookup answer</documentation>
+    <body>
+      <fields name="rr">
+        <documentation>A resource record that shall be looked up. Note that this field is (currently) mostly decoration, useful for debugging, and may be omitted. The data actually used is encoded in the 'raw' field.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceRecord" definition="//@members[name='ResourceRecord']" nullable="true"/>
+      </fields>
+      <fields name="raw">
+        <documentation>A resource record encoded in DNS wire format, in turn encoded in Base64. This is the actual data returned to the application, and should carry the same information as the 'rr' field, just in a different encoding.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Question">
+    <documentation>Encapsulates a lookup question</documentation>
+    <body>
+      <fields name="key">
+        <documentation>A resource record key that shall be looked up.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceKey" definition="//@members[name='ResourceKey']"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResourceKey">
+    <documentation>Encapsulates the class/type/name part of a DNS resource record.</documentation>
+    <body>
+      <fields name="class">
+        <documentation>The RR class, almost always IN, i.e 0x01. If unspecified defaults to IN.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="type">
+        <documentation>The RR types, one of A, AAAA, PTR, …</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="name">
+        <documentation>The domain name.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResourceRecord">
+    <documentation>Encapsulates a DNS resource record.</documentation>
+    <body>
+      <fields name="key">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceKey" definition="//@members[name='ResourceKey']"/>
+      </fields>
+      <fields name="priority">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="weight">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="port">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="name">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="cpu">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="os">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="items">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="address">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="mname">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="rname">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="serial">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="refresh">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="retry">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="expire">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="minimum">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="exchange">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="version">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="size">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="horiz_pre">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="vert_pre">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="latitude">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="longitude">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="altitude">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="keyTag">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="algorithm">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="digestType">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="digest">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fptype">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="fingerprint">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="flags">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="protocol">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="dnskey">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="signer">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="typeCovered">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="labels">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="originalTtl">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="expiration">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="inception">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="signature">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="nextDomain">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="types">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="iterations">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="salt">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="hash">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="certUsage">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="selector">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="matchingType">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="data">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="tag">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="value">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="target">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="svcparams">
+        <type xsi:type="varlink:BuiltinType" kind="object" nullable="true"/>
+      </fields>
+      <fields name="order">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="preference">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="naptrFlags">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="services">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="regexp">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="replacement">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="QueryFilter" moreSupport="supported">
+    <documentation>Returns filter parameters for this hook. A hook service can implement this to reduce lookup requests, by enabling itself only for certain domains or certain numbers of labels in the name. It's recommended to implement this to reduce the number of redundant calls to each hook. Note that this is advisory only, and implementing services must be able to gracefully handle lookup requests that do not match this filter. This call is usually made with the 'more' flag set, in which case the connection is left open after the first reply, and the implementing hook services can send updates to the filter at any time. Whenever a further reply is sent the filter configured therein fully replaces any previously communicated filter.</documentation>
+    <input/>
+    <output>
+      <fields name="filterDomains">
+        <documentation>A list of domains this hook is interested in. Lookups for domains not listed here will not be passed to the Hook via ResolveRecord(). If this field is not set, requests for all domains will be passed to the hook. Note that this applies recursively, i.e. a domain of a lookup is considered matching the listed domains both if it exactly matches it, and in case only a suffix of it matches it. If this is set to an empty array the hook is disabled.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="filterLabelsMin">
+        <documentation>Require the specified number of labels or more in a domain for the hook to be considered.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="filterLabelsMax">
+        <documentation>Require the specified number of labels or less in a domain for the hook to be considered.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ResolveRecord">
+    <documentation>Sent whenever a resolution request is made. This typically takes the filter parameters returned by QueryFilter() into account, but this is not guaranteed.</documentation>
+    <input>
+      <fields name="question">
+        <documentation>The question being looked up, i.e. a combination of resource record keys. Note that unlike DNS queries on the wire these lookups can carry multiple key requests, albeit closely related ones. Specifically, lookups for A+AAAA for the same hostname are submitted as one question, as are lookups for TXT+SRV when doing DNS-SD resolution. Moreover, when looking up resources with non-ASCII characters, they are placed together in a single question, once with labels encoded in UTF-8, and once in IDNA. Hook implementations must be able to deal with these and other similar combinations of resource key requests, and reply with all matching answers at once, or fail them as one. Partial success/failure combinations are not supported.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Question" definition="//@members[name='Question']"/>
+        </type>
+      </fields>
+    </input>
+    <output>
+      <fields name="rcode">
+        <documentation>A DNS response code. If a hook sets this return parameter further processing of the lookup via regular protocols such as DNS, LLMNR, mDNS is skipped, and the return code returned immediately. In other words, if a hook intends to let the request pass to normal resolution, it should not set this return parameter.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="answer">
+        <documentation>An answer for a lookup, i.e. a combination of resource records, matching the request. This should only be set when the 'rcode' parameter is returned as 0 (SUCCESS).</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Answer" definition="//@members[name='Answer']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+</varlink:Interface>

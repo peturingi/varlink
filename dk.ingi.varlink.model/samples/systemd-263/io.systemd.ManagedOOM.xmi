@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.ManagedOOM">
+  <members xsi:type="varlink:EnumDefinition" name="ManagedOOMMode">
+    <body>
+      <values name="auto"/>
+      <values name="kill"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ControlGroup">
+    <body>
+      <fields name="mode">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ManagedOOMMode" definition="//@members[name='ManagedOOMMode']"/>
+      </fields>
+      <fields name="path">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="property">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="limit">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="duration">
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="rules">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="SubscribeManagedOOMCGroups" moreSupport="supported">
+    <input/>
+    <output>
+      <fields name="cgroups">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="ControlGroup" definition="//@members[name='ControlGroup']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="SubscriptionTaken">
+    <parameters/>
+  </members>
+</varlink:Interface>

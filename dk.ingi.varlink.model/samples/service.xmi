@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Cross-package instance of final/varlink.ecore with five roots:
+     /0 Service org.example.ftl referencing the Interface roots of org.example.ftl.xmi and
+        MyType.xmi across resources (non-containment), with GetInfo information, four address
+        kinds, a socket activation environment and tagged socket inodes;
+     /1 ServiceRegistry with two entries leading to the service (the links are serialized on the Service's
+        registryEntries end, EMF's convention for one-to-many bidirectional references);
+     /2 HttpBridge serving two services;
+     /3 Exchange: a 'more' call with two replies (spec 'Simple Method Call' payload);
+     /4 Exchange: a call answered by an error reply;
+     /5 a second Service with a single unnamed activation descriptor. -->
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:varlink="https://ingi.dk/varlink" xmlns:json="https://ingi.dk/varlink/json" xmlns:protocol="https://ingi.dk/varlink/protocol"
+    xmlns:service="https://ingi.dk/varlink/service" xmlns:transport="https://ingi.dk/varlink/transport" xmlns:http="https://ingi.dk/varlink/http">
+  <service:Service name="org.example.ftl" registryEntries="/1/@entries.0 /1/@entries.1">
+    <information vendor="Example Inc" product="FTL Drive" version="1" url="https://example.org/ftl">
+      <interfaces>org.varlink.service</interfaces>
+      <interfaces>org.example.ftl</interfaces>
+      <interfaces>org.example.types</interfaces>
+    </information>
+    <interfaces href="org.example.ftl.xmi#/"/>
+    <interfaces href="MyType.xmi#/"/>
+    <addresses xsi:type="service:UnixPathAddress" path="/run/org.example.ftl">
+      <properties>foo=bar</properties>
+    </addresses>
+    <addresses xsi:type="service:UnixAbstractAddress" name="org.example.ftl"/>
+    <addresses xsi:type="service:TcpAddress" host="::1" port="12345"/>
+    <addresses xsi:type="service:TcpAddress" host="127.0.0.1" port="12345"/>
+    <addresses xsi:type="service:TcpAddress" host="localhost" port="12345"/>
+    <addresses xsi:type="http:HttpBridgeAddress" scheme="wss" host="host" port="1031" basePath="/waldo/" serviceName="org.example.ftl"/>
+    <socketActivation listenFds="2" listenPid="4711" listenPidfdId="6783345">
+      <listenFdNames>other</listenFdNames>
+      <listenFdNames>varlink</listenFdNames>
+    </socketActivation>
+    <sockets attributeValue="listen"/>
+    <sockets attributeValue="entrypoint" path="/run/org.example.ftl"/>
+    <sockets/>
+    <sockets attributeValue="future-role" path="/run/other"/>
+  </service:Service>
+  <service:ServiceRegistry>
+    <entries interfaceName="org.example.ftl" interface="org.example.ftl.xmi#/"/>
+    <entries interfaceName="org.example.types" symlink="true" targetPath="/run/org.example.ftl" interface="MyType.xmi#/"/>
+  </service:ServiceRegistry>
+  <http:HttpBridge baseUrl="https://host:1031/waldo/" authentication="mutualTls" services="/0 /5"/>
+  <protocol:Exchange>
+    <call method="org.example.ftl.CalculateConfiguration" more="true" methodDefinition="org.example.ftl.xmi#//@members[name='CalculateConfiguration']">
+      <parameters>
+        <members name="current">
+          <value xsi:type="json:JsonObject">
+            <members name="longitude"><value xsi:type="json:JsonNumber" lexical="27.13"/></members>
+            <members name="latitude"><value xsi:type="json:JsonNumber" lexical="-12.4"/></members>
+            <members name="distance"><value xsi:type="json:JsonNumber" lexical="48732498234"/></members>
+          </value>
+        </members>
+        <members name="target">
+          <value xsi:type="json:JsonObject">
+            <members name="longitude"><value xsi:type="json:JsonNumber" lexical="-48.7"/></members>
+            <members name="latitude"><value xsi:type="json:JsonNumber" lexical="12.9"/></members>
+            <members name="distance"><value xsi:type="json:JsonNumber" lexical="354667658787"/></members>
+          </value>
+        </members>
+      </parameters>
+      <vendorExtensions vendor="org.example">
+        <value>
+          <members name="trace"><value xsi:type="json:JsonBoolean" value="true"/></members>
+          <members name="tags"><value xsi:type="json:JsonArray"><elements xsi:type="json:JsonString" value="a"/><elements xsi:type="json:JsonNull"/></value></members>
+        </value>
+      </vendorExtensions>
+    </call>
+    <replies continues="true">
+      <parameters>
+        <members name="configuration">
+          <value xsi:type="json:JsonObject">
+            <members name="speed"><value xsi:type="json:JsonNumber" lexical="32434234"/></members>
+            <members name="trajectory"><value xsi:type="json:JsonNumber" lexical="686787"/></members>
+            <members name="duration"><value xsi:type="json:JsonNumber" lexical="13256445"/></members>
+          </value>
+        </members>
+      </parameters>
+    </replies>
+    <replies/>
+  </protocol:Exchange>
+  <protocol:Exchange>
+    <call method="org.example.ftl.Jump" methodDefinition="org.example.ftl.xmi#//@members[name='Jump']"/>
+    <replies error="org.example.ftl.NotEnoughEnergy" errorDefinition="org.example.ftl.xmi#//@members[name='NotEnoughEnergy']"/>
+  </protocol:Exchange>
+  <service:Service name="org.example.types">
+    <interfaces href="MyType.xmi#/"/>
+    <socketActivation listenFds="1">
+      <listenFdNames>other</listenFdNames>
+    </socketActivation>
+  </service:Service>
+</xmi:XMI>

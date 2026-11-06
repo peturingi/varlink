@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Interface org.example.types, hand-written against final/varlink.ecore. It contains the spec's
+     'type MyType (...)' example verbatim (section 'Types'), the enumeration MyOtherType it refers to,
+     a type Deep with the nested shapes the spec grammar admits beyond what systemd's parser accepts
+     ([][]int, []?int, ?[string]?[string](), inline struct/enum at depth 3, [string][](p, q), a bare '()'
+     field type, ?any, ?object), the empty named struct 'type Empty ()', a method with empty input and
+     output, methods with the four systemd flag markers and an [Experimental] member, an error without
+     parameters and an error with parameters including a nested inline struct.
+
+     IDL equivalent (documentation lines are the <documentation> elements below):
+
+       interface org.example.types
+       type MyType ( example_bool: bool, ... example_other_type: MyOtherType )      (spec text)
+       type MyOtherType (alpha, beta, null, continue, default)
+       type Deep ( matrix: [][]int, holes: []?int, maybe_map_of_maybe_sets: ?[string]?[string](),
+                   nested: ?[](first: int, second: (a, b), third: ?[]?(x: ?MyOtherType)),
+                   map_of_arrays_of_enums: [string][](p, q), empty_struct_field: (),
+                   nullable_any: ?any, nullable_object: ?object )
+       type Empty ()
+       method Nothing() -> ()
+       method Echo(type: string, class: ?MyOtherType) -> (type: string, method: ?int)
+       # [Supports 'more' flag]
+       method Stream(count: ?int) -> (item: ?MyType, index: int)
+       # [Requires 'more' flag]
+       method Watch() -> (event: MyType)
+       # [Supports 'upgrade' flag]
+       # [Experimental]
+       method Upgrade(proto: string) -> ()
+       # [Requires 'upgrade' flag]
+       method MustUpgrade() -> (ok: bool)
+       error Nope ()
+       error Detailed (field: string, more_data: ?(code: int, items: []MyOtherType)) -->
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:varlink="https://ingi.dk/varlink" name="org.example.types">
+  <documentation>Every type form of the UAPI.20 grammar in one interface.</documentation>
+  <documentation></documentation>
+  <documentation>The empty comment line above must survive as an empty documentation entry.</documentation>
+
+  <!-- type MyType (...) : the spec's example, verbatim -->
+  <members xsi:type="varlink:StructDefinition" name="MyType">
+    <documentation>The example of the spec section 'Types'.</documentation>
+    <body>
+      <fields name="example_bool"><type xsi:type="varlink:BuiltinType" kind="bool"/></fields>
+      <fields name="example_int"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+      <fields name="example_float"><type xsi:type="varlink:BuiltinType" kind="float"/></fields>
+      <fields name="example_string"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+      <fields name="example_object"><type xsi:type="varlink:BuiltinType" kind="object"/></fields>
+      <fields name="example_any"><type xsi:type="varlink:BuiltinType" kind="any"/></fields>
+      <fields name="example_enum">
+        <type xsi:type="varlink:EnumType">
+          <values name="one"/>
+          <values name="two"/>
+          <values name="three"/>
+        </type>
+      </fields>
+      <fields name="example_struct">
+        <type xsi:type="varlink:StructType">
+          <fields name="first"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+          <fields name="second"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+        </type>
+      </fields>
+      <fields name="example_array">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="example_dictionary">
+        <type xsi:type="varlink:MapType">
+          <valueType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="example_stringset">
+        <documentation>A set of strings: a map with the empty structure as value type.</documentation>
+        <type xsi:type="varlink:MapType">
+          <valueType xsi:type="varlink:StructType"/>
+        </type>
+      </fields>
+      <fields name="example_nullable">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="example_nullable_array_struct">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:StructType">
+            <fields name="first"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+            <fields name="second"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+          </elementType>
+        </type>
+      </fields>
+      <fields name="example_other_type">
+        <type xsi:type="varlink:NamedTypeReference" typeName="MyOtherType" definition="//@members[name='MyOtherType']"/>
+      </fields>
+    </body>
+  </members>
+
+  <!-- type MyOtherType (alpha, beta, null, continue, default) : referenced before it is declared (forward reference) -->
+  <members xsi:type="varlink:EnumDefinition" name="MyOtherType">
+    <documentation>An enumeration type definition; MyType refers to it before it is declared.</documentation>
+    <body>
+      <values name="alpha">
+        <documentation>documented value</documentation>
+      </values>
+      <values name="beta"/>
+      <values name="null">
+        <documentation>python keywords as enum values occur in the corpus (io.systemd.Unit)</documentation>
+      </values>
+      <values name="continue"/>
+      <values name="default"/>
+    </body>
+  </members>
+
+  <!-- type Deep (...) : shapes the spec grammar admits but systemd's parser does not -->
+  <members xsi:type="varlink:StructDefinition" name="Deep">
+    <documentation>Shapes the spec grammar admits but systemd's parser does not.</documentation>
+    <body>
+      <fields name="matrix">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:ArrayType">
+            <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+          </elementType>
+        </type>
+      </fields>
+      <fields name="holes">
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+        </type>
+      </fields>
+      <fields name="maybe_map_of_maybe_sets">
+        <type xsi:type="varlink:MapType" nullable="true">
+          <valueType xsi:type="varlink:MapType" nullable="true">
+            <valueType xsi:type="varlink:StructType"/>
+          </valueType>
+        </type>
+      </fields>
+      <fields name="nested">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:StructType">
+            <fields name="first"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+            <fields name="second">
+              <type xsi:type="varlink:EnumType">
+                <values name="a"/>
+                <values name="b"/>
+              </type>
+            </fields>
+            <fields name="third">
+              <type xsi:type="varlink:ArrayType" nullable="true">
+                <elementType xsi:type="varlink:StructType" nullable="true">
+                  <fields name="x">
+                    <type xsi:type="varlink:NamedTypeReference" nullable="true" typeName="MyOtherType" definition="//@members[name='MyOtherType']"/>
+                  </fields>
+                </elementType>
+              </type>
+            </fields>
+          </elementType>
+        </type>
+      </fields>
+      <fields name="map_of_arrays_of_enums">
+        <type xsi:type="varlink:MapType">
+          <valueType xsi:type="varlink:ArrayType">
+            <elementType xsi:type="varlink:EnumType">
+              <values name="p"/>
+              <values name="q"/>
+            </elementType>
+          </valueType>
+        </type>
+      </fields>
+      <fields name="empty_struct_field">
+        <type xsi:type="varlink:StructType"/>
+      </fields>
+      <fields name="nullable_any">
+        <type xsi:type="varlink:BuiltinType" kind="any" nullable="true"/>
+      </fields>
+      <fields name="nullable_object">
+        <type xsi:type="varlink:BuiltinType" kind="object" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+
+  <!-- type Empty () : grammatical per the spec, refused by systemd -->
+  <members xsi:type="varlink:StructDefinition" name="Empty">
+    <documentation>Empty named struct: grammatical per the spec, refused by systemd.</documentation>
+    <body/>
+  </members>
+
+  <!-- method Nothing() -> () -->
+  <members xsi:type="varlink:Method" name="Nothing">
+    <documentation>A method with empty input and output.</documentation>
+    <input/>
+    <output/>
+  </members>
+
+  <!-- method Echo(type: string, class: ?MyOtherType) -> (type: string, method: ?int) -->
+  <members xsi:type="varlink:Method" name="Echo">
+    <documentation>Same parameter name in input and output (separate namespaces), keyword field names.</documentation>
+    <input>
+      <fields name="type"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+      <fields name="class">
+        <type xsi:type="varlink:NamedTypeReference" nullable="true" typeName="MyOtherType" definition="//@members[name='MyOtherType']"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="type"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+      <fields name="method"><type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/></fields>
+    </output>
+  </members>
+
+  <!-- # [Supports 'more' flag]  method Stream(count: ?int) -> (item: ?MyType, index: int) -->
+  <members xsi:type="varlink:Method" name="Stream" moreSupport="supported">
+    <documentation>Streams items; may also be called as a plain method.</documentation>
+    <input>
+      <fields name="count"><type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/></fields>
+    </input>
+    <output>
+      <fields name="item">
+        <type xsi:type="varlink:NamedTypeReference" nullable="true" typeName="MyType" definition="//@members[name='MyType']"/>
+      </fields>
+      <fields name="index"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+    </output>
+  </members>
+
+  <!-- # [Requires 'more' flag]  method Watch() -> (event: MyType) -->
+  <members xsi:type="varlink:Method" name="Watch" moreSupport="required">
+    <documentation>Requires more: iterator-only in a generated client.</documentation>
+    <input/>
+    <output>
+      <fields name="event">
+        <type xsi:type="varlink:NamedTypeReference" typeName="MyType" definition="//@members[name='MyType']"/>
+      </fields>
+    </output>
+  </members>
+
+  <!-- # [Supports 'upgrade' flag]  # [Experimental]  method Upgrade(proto: string) -> () -->
+  <members xsi:type="varlink:Method" name="Upgrade" upgradeSupport="supported" experimental="true">
+    <documentation>Hands the connection over to another protocol.</documentation>
+    <input>
+      <fields name="proto"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+    </input>
+    <output/>
+  </members>
+
+  <!-- # [Requires 'upgrade' flag]  method MustUpgrade() -> (ok: bool) -->
+  <members xsi:type="varlink:Method" name="MustUpgrade" upgradeSupport="required">
+    <input/>
+    <output>
+      <fields name="ok"><type xsi:type="varlink:BuiltinType" kind="bool"/></fields>
+    </output>
+  </members>
+
+  <!-- error Nope () -->
+  <members xsi:type="varlink:ErrorDefinition" name="Nope">
+    <documentation>Error without parameters.</documentation>
+    <parameters/>
+  </members>
+
+  <!-- error Detailed (field: string, more_data: ?(code: int, items: []MyOtherType)) -->
+  <members xsi:type="varlink:ErrorDefinition" name="Detailed">
+    <documentation>Error with parameters, including a nested inline struct and an array of named types.</documentation>
+    <parameters>
+      <fields name="field"><type xsi:type="varlink:BuiltinType" kind="string"/></fields>
+      <fields name="more_data">
+        <type xsi:type="varlink:StructType" nullable="true">
+          <fields name="code"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+          <fields name="items">
+            <type xsi:type="varlink:ArrayType">
+              <elementType xsi:type="varlink:NamedTypeReference" typeName="MyOtherType" definition="//@members[name='MyOtherType']"/>
+            </type>
+          </fields>
+        </type>
+      </fields>
+    </parameters>
+  </members>
+</varlink:Interface>

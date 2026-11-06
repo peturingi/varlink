@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.0"?>
+
+<!--
+-->
+
+<plugin>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated model -->
+      <package
+            uri="https://ingi.dk/varlink"
+            class="dk.ingi.varlink.VarlinkPackage"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated model -->
+      <package
+            uri="https://ingi.dk/varlink/json"
+            class="dk.ingi.varlink.json.JsonPackage"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated model -->
+      <package
+            uri="https://ingi.dk/varlink/protocol"
+            class="dk.ingi.varlink.protocol.ProtocolPackage"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated model -->
+      <package
+            uri="https://ingi.dk/varlink/service"
+            class="dk.ingi.varlink.service.ServicePackage"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated model -->
+      <package
+            uri="https://ingi.dk/varlink/transport"
+            class="dk.ingi.varlink.transport.TransportPackage"/>
+   </extension>
+
+   <extension point="org.eclipse.emf.ecore.generated_package">
+      <!-- @generated model -->
+      <package
+            uri="https://ingi.dk/varlink/http"
+            class="dk.ingi.varlink.http.HttpPackage"/>
+   </extension>
+</plugin>

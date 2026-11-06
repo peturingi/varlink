@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deliberately INVALID cross-package instance: planted violations of protocol, service, transport and http constraints. -->
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:json="https://ingi.dk/varlink/json" xmlns:protocol="https://ingi.dk/varlink/protocol"
+    xmlns:service="https://ingi.dk/varlink/service" xmlns:transport="https://ingi.dk/varlink/transport" xmlns:http="https://ingi.dk/varlink/http">
+  <protocol:Exchange>                                                   <!-- /0 -->
+    <call method="Jump" oneway="true" more="true">                      <!-- Call.methodQualified, Call.atMostOneFlag -->
+      <vendorExtensions vendor="nodots"><value/></vendorExtensions>     <!-- VendorExtension.vendorReverseDomain -->
+      <vendorExtensions vendor="org.example"><value/></vendorExtensions>
+      <vendorExtensions vendor="org.example"><value/></vendorExtensions> <!-- Message.vendorsUnique -->
+    </call>
+    <replies error="NotQualified" continues="true"/>                    <!-- Exchange.onewayHasNoReplies, continuesOnlyWhenMore(no: more is set), Reply.errorReplyNeverContinues, Reply.errorQualified, finalReplyTerminates -->
+  </protocol:Exchange>
+  <protocol:Exchange>                                                   <!-- /1 -->
+    <call method="org.example.ftl.Jump"/>
+    <replies continues="true"/>                                         <!-- Exchange.singleReplyUnlessMore, continuesOnlyWhenMore, intermediateRepliesContinue(no) -->
+    <replies/>
+  </protocol:Exchange>
+  <service:Service>                                                     <!-- /2 : unnamed, served by the bridge below -->
+    <information vendor="v" product="p" version="1" url="u">
+      <interfaces>org.example.ftl</interfaces>                          <!-- ServiceInformation.includesVarlinkService -->
+      <interfaces>bad</interfaces>                                      <!-- ServiceInformation.interfaceNamesWellFormed -->
+    </information>
+    <addresses xsi:type="service:UnixPathAddress" path="@abstract">     <!-- UnixPathAddress.pathNotEmpty -->
+      <properties>a;b</properties>                                      <!-- ServiceAddress.propertiesWellFormed -->
+    </addresses>
+    <addresses xsi:type="service:UnixAbstractAddress" name=""/>         <!-- UnixAbstractAddress.nameNotEmpty -->
+    <addresses xsi:type="service:TcpAddress" host="[::1]" port="0"/>    <!-- TcpAddress.portRange, hostNotBracketed -->
+    <addresses xsi:type="http:HttpBridgeAddress" scheme="ws" host="" port="70000" basePath="waldo" serviceName="a/b"/> <!-- hostNotEmpty, portRange, basePathSlashes, serviceNameWellFormed -->
+    <socketActivation listenFds="2">
+      <listenFdNames>other</listenFdNames>                              <!-- fdNamesMatchCount, varlinkSocketNamed -->
+    </socketActivation>
+    <sockets attributeValue="entrypoint"/>                                        <!-- SocketInode.entrypointHasPath -->
+    <sockets attributeValue="listen" path="/run/x"/>                              <!-- SocketInode.sockfsRolesHaveNoPath -->
+  </service:Service>
+  <service:ServiceRegistry directory="/run/varlink/registry/">          <!-- /3 : ServiceRegistry.directoryAbsolute, entryNamesUnique -->
+    <entries interfaceName="org.example.ftl" targetPath="/run/x"/>      <!-- RegistryEntry.targetOnlyForSymlink -->
+    <entries interfaceName="org.example.ftl"/>
+    <entries interfaceName="bad"/>                                      <!-- RegistryEntry.interfaceNameSyntax -->
+  </service:ServiceRegistry>
+  <http:HttpBridge baseUrl="ftp://host/" services="/2 /5 /7"/>           <!-- /4 : HttpBridge.baseUrlSyntax, servicesNamed, serviceNamesUnique -->
+  <service:Service name="dup"/>                                         <!-- /5 -->
+  <json:JsonObject>                                                     <!-- /6 -->
+    <members name="k"><value xsi:type="json:JsonNumber" lexical="01"/></members>   <!-- JsonNumber.lexicalSyntax -->
+    <members name="k"><value xsi:type="json:JsonNull"/></members>       <!-- JsonObject.memberNamesUnique -->
+  </json:JsonObject>
+  <service:Service name="dup"/>                                         <!-- /7 : same name as /5 -->
+  <protocol:Exchange>                                                   <!-- /8 : upgradeConfirmedOnce, intermediateRepliesContinue (+ singleReplyUnlessMore, continuesOnlyWhenMore, finalReplyTerminates) -->
+    <call method="org.example.ftl.Monitor" upgrade="true" methodDefinition="org.example.ftl.xmi#//@members[name='Jump']"/>   <!-- Call.methodDefinitionMatches -->
+    <replies/>
+    <replies continues="true" error="org.example.ftl.ParameterOutOfRange" errorDefinition="org.example.ftl.xmi#//@members[name='NotEnoughEnergy']"/> <!-- Reply.errorDefinitionMatches, errorReplyNeverContinues -->
+  </protocol:Exchange>
+  <service:Service name="org.example.twice" registryEntries="/10/@entries.0 /10/@entries.1">   <!-- /9 : interfaceNamesUnique (two Interface objects both named org.example.ftl), informationListsImplementedInterfaces, registryEntriesNameImplementedInterfaces -->
+    <information vendor="v" product="p" version="1" url="u">
+      <interfaces>org.varlink.service</interfaces>
+    </information>
+    <interfaces href="org.example.ftl.xmi#/"/>
+    <interfaces href="org.example.ftl.xmi#/"/>
+    <socketActivation listenFds="-1"/>                                  <!-- SocketActivationEnvironment.listenFdsNonNegative -->
+  </service:Service>
+  <service:ServiceRegistry>                                             <!-- /10 -->
+    <entries interfaceName="org.example.ftl"/>
+    <entries interfaceName="org.example.types" interface="org.example.ftl.xmi#/"/>   <!-- RegistryEntry.interfaceMatches; and not implemented by /9 -->
+  </service:ServiceRegistry>
+</xmi:XMI>

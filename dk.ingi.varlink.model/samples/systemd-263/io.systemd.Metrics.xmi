@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Metrics">
+  <documentation>Metrics APIs</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="MetricFamilyType">
+    <documentation>An enum representing various metric family types</documentation>
+    <body>
+      <values name="counter">
+        <documentation>A counter metric family type which is a monotonically increasing value</documentation>
+      </values>
+      <values name="gauge">
+        <documentation>A gauge metric family type which is a value that can go up and down</documentation>
+      </values>
+      <values name="string">
+        <documentation>A string metric family type</documentation>
+      </values>
+      <values name="object">
+        <documentation>An object metric family type whose value is an arbitrary JSON object</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="List" moreSupport="required">
+    <documentation>Method to get a list of metrics among which the collection of related metrics forms a metric family</documentation>
+    <input/>
+    <output>
+      <fields name="name">
+        <documentation>Metric family name, e.g. io.systemd.Manager.unitsByTypeTotal or io.systemd.Manager.unitActiveState</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="object">
+        <documentation>Metric object name can be unit name, process name, etc, e.g. dev-hvc0.device</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="fields">
+        <documentation>Metric fields are values to differentiate between different metrics in the same metric family</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="object" nullable="true"/>
+      </fields>
+      <fields name="value">
+        <documentation>Metric value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="any"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Describe" moreSupport="required">
+    <documentation>Method to get the metric families</documentation>
+    <input/>
+    <output>
+      <fields name="name">
+        <documentation>Metric family name</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="description">
+        <documentation>Metric family description</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="type">
+        <documentation>Metric family type</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="MetricFamilyType" definition="//@members[name='MetricFamilyType']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchMetric">
+    <documentation>No such metric found</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

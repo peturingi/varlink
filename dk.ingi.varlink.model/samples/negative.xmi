@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Deliberately INVALID instance of final/varlink.ecore: every planted violation must be reported by its
+     constraint name under the OCL Pivot delegate. Roots: /0 = interface 'bad', /1 = org.example.other,
+     /2 = org.example.experimental (the experimental-leak case), /3 = an interface whose documentation
+     contains systemd marker lines. -->
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:varlink="https://ingi.dk/varlink">
+  <varlink:Interface name="bad">                                                 <!-- Interface.nameSyntax: one component -->
+    <members xsi:type="varlink:StructDefinition" name="lower">                   <!-- Member.nameSyntax -->
+      <body nullable="true">                                                     <!-- StructDefinition.bodyNotNullable -->
+        <fields name="a"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>
+        <fields name="a"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>      <!-- StructType.fieldNamesUnique -->
+        <fields name="_x"><type xsi:type="varlink:BuiltinType" kind="int"/></fields>     <!-- Field.nameSyntax -->
+        <fields name="y" experimental="true"><type xsi:type="varlink:BuiltinType" kind="int"/></fields> <!-- Field.systemdExperimentalFieldNullable -->
+        <fields name="e">
+          <type xsi:type="varlink:EnumType">                                     <!-- EnumType.valueNamesUnique -->
+            <values name="v"/>
+            <values name="v"/>
+            <values name="bad__name"/>                                           <!-- EnumValue.nameSyntax -->
+            <values name="exp" experimental="true"/>                             <!-- EnumValue.systemdExperimentalValueInExperimentalEnum -->
+          </type>
+        </fields>
+        <fields name="foreign">
+          <type xsi:type="varlink:NamedTypeReference" typeName="Wrong" definition="/1/@members[name='Remote']"/>  <!-- definitionInSameInterface, typeNameMatchesDefinition -->
+        </fields>
+        <fields name="misplaced">
+          <type xsi:type="varlink:ParameterStruct"/>                             <!-- ParameterStruct.containedByMethod -->
+        </fields>
+      </body>
+    </members>
+    <members xsi:type="varlink:EnumDefinition" name="Colour">
+      <body nullable="true">                                                     <!-- EnumDefinition.bodyNotNullable -->
+        <values name="red"/>
+      </body>
+    </members>
+    <members xsi:type="varlink:Method" name="Dup">                               <!-- Interface.memberNamesUnique (Dup x2) -->
+      <input nullable="true"/>                                                   <!-- Method.parameterStructsNotNullable -->
+      <output/>
+    </members>
+    <members xsi:type="varlink:ErrorDefinition" name="Dup">
+      <parameters nullable="true"/>                                              <!-- ErrorDefinition.parametersNotNullable -->
+    </members>
+  </varlink:Interface>
+  <varlink:Interface name="org.example.other">
+    <members xsi:type="varlink:StructDefinition" name="Remote">
+      <body/>
+    </members>
+  </varlink:Interface>
+  <varlink:Interface name="org.example.experimental">
+    <members xsi:type="varlink:StructDefinition" name="Secret" experimental="true">
+      <body><fields name="value"><type xsi:type="varlink:BuiltinType" kind="string"/></fields></body>
+    </members>
+    <members xsi:type="varlink:StructDefinition" name="Stable">
+      <body>
+        <fields name="leak">                                                     <!-- non-experimental field refers to experimental type -->
+          <type xsi:type="varlink:NamedTypeReference" typeName="Secret" definition="/2/@members[name='Secret']"/>  <!-- NamedTypeReference.systemdExperimentalTypeUsedInExperimentalContext -->
+        </fields>
+        <fields name="fine" experimental="true">                                 <!-- experimental + nullable: allowed -->
+          <type xsi:type="varlink:NamedTypeReference" nullable="true" typeName="Secret" definition="/2/@members[name='Secret']"/>
+        </fields>
+      </body>
+    </members>
+  </varlink:Interface>
+  <varlink:Interface name="org.example.markers">
+    <members xsi:type="varlink:Method" name="Marked">
+      <documentation>Real documentation line.</documentation>
+      <documentation>[Supports 'more' flag]</documentation>                      <!-- Declaration.systemdMarkersNotInDocumentation -->
+      <input/>
+      <output/>
+    </members>
+    <members xsi:type="varlink:ErrorDefinition" name="Marked2">
+      <documentation>[Experimental]</documentation>                              <!-- Declaration.systemdMarkersNotInDocumentation -->
+      <parameters/>
+    </members>
+  </varlink:Interface>
+</xmi:XMI>

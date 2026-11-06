@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.service">
+  <documentation>An interface to control basic properties of systemd services.</documentation>
+  <members xsi:type="varlink:Method" name="Ping">
+    <documentation>Checks if the service is running.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Reload">
+    <documentation>Reloads configuration files.</documentation>
+    <input>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetLogLevel">
+    <documentation>Sets the maximum log level.</documentation>
+    <input>
+      <fields name="level">
+        <documentation>The maximum log level, using BSD syslog log level integers.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="GetLogLevel">
+    <documentation>Gets the maximum log level.</documentation>
+    <input/>
+    <output>
+      <fields name="level">
+        <documentation>The current maximum log level, using BSD syslog level integers.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="GetEnvironment">
+    <documentation>Get current environment block.</documentation>
+    <input/>
+    <output>
+      <fields name="environment">
+        <documentation>Returns the current environment block, i.e. the contents of environ[].</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="InconsistentEnvironment">
+    <documentation>Returned if the environment block is currently not in a valid state.</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

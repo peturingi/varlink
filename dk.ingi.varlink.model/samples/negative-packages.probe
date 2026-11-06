@@ -1,0 +1,12 @@
+ALLVIOL
+VIOL /0 == [atMostOneFlag, errorQualified, errorReplyNeverContinues, finalReplyTerminates, methodQualified, onewayHasNoReplies, vendorReverseDomain, vendorsUnique]
+VIOL /1 == [continuesOnlyWhenMore, singleReplyUnlessMore]
+VIOL /2 == [basePathSlashes, entrypointHasPath, fdNamesMatchCount, hostNotBracketed, hostNotEmpty, includesVarlinkService, interfaceNamesWellFormed, nameNotEmpty, pathNotEmpty, portRange, portRange, propertiesWellFormed, serviceNameWellFormed, sockfsRolesHaveNoPath, varlinkSocketNamed]
+VIOL /3 == [directoryAbsolute, entryNamesUnique, interfaceNameSyntax, targetOnlyForSymlink]
+VIOL /4 == [baseUrlSyntax, serviceNamesUnique, servicesNamed]
+VIOL /5 == []
+VIOL /6 == [lexicalSyntax, memberNamesUnique]
+VIOL /7 == []
+VIOL /8 == [continuesOnlyWhenMore, errorDefinitionMatches, errorReplyNeverContinues, finalReplyTerminates, intermediateRepliesContinue, methodDefinitionMatches, singleReplyUnlessMore, upgradeConfirmedOnce]
+VIOL /9 == [informationListsImplementedInterfaces, interfaceNamesUnique, listenFdsNonNegative, registryEntriesNameImplementedInterfaces]
+VIOL /10 == [interfaceMatches]

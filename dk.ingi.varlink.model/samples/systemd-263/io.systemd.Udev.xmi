@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Udev">
+  <documentation>An interface for controlling systemd-udevd.</documentation>
+  <members xsi:type="varlink:Method" name="SetTrace">
+    <documentation>Enable/disable trace logging.</documentation>
+    <input>
+      <fields name="enable">
+        <documentation>Enable/disable.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetChildrenMax">
+    <documentation>Sets the maximum number of child processes.</documentation>
+    <input>
+      <fields name="number">
+        <documentation>The maximum number of child processes. When 0 is specified, the maximum is determined based on the system resources.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SetEnvironment">
+    <documentation>Sets the global udev properties.</documentation>
+    <input>
+      <fields name="assignments">
+        <documentation>An array of global udev property assignments. Each string must be in KEY=VALUE style.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Revert">
+    <documentation>Revert previously set configurations.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="StartExecQueue">
+    <documentation>Starts processing of queued events.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="StopExecQueue">
+    <documentation>Stops processing of queued events.</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Exit">
+    <documentation>Terminates systemd-udevd. This exists for backward compatibility. Please consider to use 'systemctl stop systemd-udevd.service'.</documentation>
+    <input/>
+    <output/>
+  </members>
+</varlink:Interface>

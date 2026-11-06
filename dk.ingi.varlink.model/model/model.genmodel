@@ -1,0 +1,823 @@
+<?xml version="1.0" encoding="ASCII"?>
+<genmodel:GenModel xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" xmlns:genmodel="http://www.eclipse.org/emf/2002/GenModel" modelDirectory="/dk.ingi.varlink.model/src-gen" creationIcons="false" editDirectory="/dk.ingi.varlink.model.edit/src-gen" editorDirectory="/dk.ingi.varlink.model.editor/src-gen" modelPluginID="dk.ingi.varlink.model" modelName="Varlink" rootExtendsClass="org.eclipse.emf.ecore.impl.MinimalEObjectImpl$Container" codeFormatting="true" importerID="org.eclipse.emf.importer.ecore" featureDelegation="Dynamic" complianceLevel="27.0" copyrightFields="false" operationReflection="true" importOrganizing="true">
+  <genAnnotations source="http://www.eclipse.org/OCL/GenModel">
+    <details key="Use Delegates" value="true"/>
+  </genAnnotations>
+  <foreignModel>model.ecore</foreignModel>
+  <genPackages prefix="Varlink" basePackage="dk.ingi" disposableProviderFactory="true">
+    <ecorePackage href="model.ecore#/"/>
+    <genEnums typeSafeEnumCompatible="false">
+      <ecoreEnum href="model.ecore#//CallFlagSupport"/>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//CallFlagSupport/unspecified"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//CallFlagSupport/supported"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//CallFlagSupport/required"/>
+      </genEnumLiterals>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false">
+      <ecoreEnum href="model.ecore#//BuiltinKind"/>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//BuiltinKind/bool"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//BuiltinKind/int"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//BuiltinKind/float"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//BuiltinKind/string"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//BuiltinKind/object"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//BuiltinKind/any"/>
+      </genEnumLiterals>
+    </genEnums>
+    <genEnums typeSafeEnumCompatible="false">
+      <ecoreEnum href="model.ecore#//ParameterDirection"/>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//ParameterDirection/input"/>
+      </genEnumLiterals>
+      <genEnumLiterals>
+        <ecoreEnumLiteral href="model.ecore#//ParameterDirection/output"/>
+      </genEnumLiterals>
+    </genEnums>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//InterfaceElement"/>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//InterfaceElement/owningInterface"/>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//InterfaceElement/enclosingMember"/>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//InterfaceElement/effectiveExperimental"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//Declaration"/>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Declaration/name"/>
+      </genFeatures>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Declaration/documentation"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Declaration/documentationText"/>
+      </genFeatures>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Declaration/experimental"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//Interface"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Interface/members"/>
+      </genFeatures>
+      <genFeatures property="Readonly" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Interface/types"/>
+      </genFeatures>
+      <genFeatures property="Readonly" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Interface/methods"/>
+      </genFeatures>
+      <genFeatures property="Readonly" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Interface/errors"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Interface/nameSegments"/>
+      </genFeatures>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Interface/source"/>
+      </genFeatures>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//Interface/findMember"/>
+        <genParameters>
+          <ecoreParameter href="model.ecore#//Interface/findMember/memberName"/>
+        </genParameters>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//Interface/findType"/>
+        <genParameters>
+          <ecoreParameter href="model.ecore#//Interface/findType/typeName"/>
+        </genParameters>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//Interface/findMethod"/>
+        <genParameters>
+          <ecoreParameter href="model.ecore#//Interface/findMethod/methodName"/>
+        </genParameters>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//Interface/findError"/>
+        <genParameters>
+          <ecoreParameter href="model.ecore#//Interface/findError/errorName"/>
+        </genParameters>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//Interface/fileName"/>
+      </genOperations>
+    </genClasses>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//Member"/>
+      <genFeatures property="None" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Member/interface"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Member/qualifiedName"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//TypeDefinition"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//TypeDefinition/usages"/>
+      </genFeatures>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//TypeDefinition/definedType"/>
+      </genOperations>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//StructDefinition"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//StructDefinition/body"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//EnumDefinition"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//EnumDefinition/body"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//Method"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Method/input"/>
+      </genFeatures>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Method/output"/>
+      </genFeatures>
+      <genFeatures property="Readonly" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Method/inputParameters"/>
+      </genFeatures>
+      <genFeatures property="Readonly" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Method/outputParameters"/>
+      </genFeatures>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Method/moreSupport"/>
+      </genFeatures>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Method/upgradeSupport"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Method/supportsMore"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Method/requiresMore"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Method/supportsUpgrade"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Method/requiresUpgrade"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//ErrorDefinition"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//ErrorDefinition/parameters"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//Field"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Field/type"/>
+      </genFeatures>
+      <genFeatures property="None" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//Field/structType"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//Field/nullable"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//EnumValue"/>
+      <genFeatures property="None" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//EnumValue/enumType"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//TypeExpression"/>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//TypeExpression/nullable"/>
+      </genFeatures>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//TypeExpression/text"/>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//TypeExpression/enclosingField"/>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//TypeExpression/enclosingFields"/>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//TypeExpression/positionPath"/>
+      </genOperations>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//TypeExpression/positionName"/>
+      </genOperations>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//ArrayType"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//ArrayType/elementType"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//MapType"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//MapType/valueType"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//MapType/stringSet"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//ElementType"/>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//BuiltinType"/>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//BuiltinType/kind"/>
+      </genFeatures>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//BuiltinType/keyword"/>
+      </genOperations>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//NamedTypeReference"/>
+      <genFeatures createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//NamedTypeReference/typeName"/>
+      </genFeatures>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//NamedTypeReference/definition"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses image="false">
+      <ecoreClass href="model.ecore#//CompositeType"/>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//CompositeType/inline"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//StructType"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//StructType/fields"/>
+      </genFeatures>
+      <genOperations>
+        <ecoreOperation href="model.ecore#//StructType/findField"/>
+        <genParameters>
+          <ecoreParameter href="model.ecore#//StructType/findField/fieldName"/>
+        </genParameters>
+      </genOperations>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//ParameterStruct"/>
+      <genFeatures property="Readonly" notify="false" createChild="false">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//ParameterStruct/method"/>
+      </genFeatures>
+      <genFeatures property="Readonly" createChild="false">
+        <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//ParameterStruct/direction"/>
+      </genFeatures>
+    </genClasses>
+    <genClasses>
+      <ecoreClass href="model.ecore#//EnumType"/>
+      <genFeatures property="None" children="true" createChild="true">
+        <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//EnumType/values"/>
+      </genFeatures>
+    </genClasses>
+    <nestedGenPackages prefix="Json" disposableProviderFactory="true">
+      <ecorePackage href="model.ecore#//json"/>
+      <genClasses image="false">
+        <ecoreClass href="model.ecore#//json/JsonValue"/>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonObject"/>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//json/JsonObject/members"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//json/JsonObject/member"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//json/JsonObject/member/memberName"/>
+          </genParameters>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonMember"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//json/JsonMember/name"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//json/JsonMember/value"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonArray"/>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//json/JsonArray/elements"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonString"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//json/JsonString/value"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonNumber"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//json/JsonNumber/lexical"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//json/JsonNumber/isInteger"/>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonBoolean"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//json/JsonBoolean/value"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//json/JsonNull"/>
+      </genClasses>
+    </nestedGenPackages>
+    <nestedGenPackages prefix="Protocol" disposableProviderFactory="true">
+      <ecorePackage href="model.ecore#//protocol"/>
+      <genClasses image="false">
+        <ecoreClass href="model.ecore#//protocol/Message"/>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/Message/parameters"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/Message/vendorExtensions"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//protocol/Call"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Call/method"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Call/oneway"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Call/more"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Call/upgrade"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/Call/methodDefinition"/>
+        </genFeatures>
+        <genFeatures property="Readonly" createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Call/interfaceName"/>
+        </genFeatures>
+        <genFeatures property="Readonly" createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Call/methodName"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//protocol/Reply"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Reply/continues"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Reply/error"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/Reply/errorDefinition"/>
+        </genFeatures>
+        <genFeatures property="Readonly" createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/Reply/errorReply"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//protocol/VendorExtension"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//protocol/VendorExtension/vendor"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/VendorExtension/value"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//protocol/Exchange"/>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/Exchange/call"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//protocol/Exchange/replies"/>
+        </genFeatures>
+      </genClasses>
+    </nestedGenPackages>
+    <nestedGenPackages prefix="Service" disposableProviderFactory="true">
+      <ecorePackage href="model.ecore#//service"/>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//service/StandardError"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/InterfaceNotFound"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/MethodNotFound"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/MethodNotImplemented"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/InvalidParameter"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/PermissionDenied"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/ExpectedMore"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/StandardError/ExpectedUpgrade"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//service/TcpHostKind"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/TcpHostKind/hostname"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/TcpHostKind/ipv4"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//service/TcpHostKind/ipv6"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/Service"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/Service/name"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/Service/information"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/Service/interfaces"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/Service/addresses"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/Service/socketActivation"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/Service/sockets"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/Service/registryEntries"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//service/Service/implementsInterface"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//service/Service/implementsInterface/interfaceName"/>
+          </genParameters>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/ServiceInformation"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceInformation/vendor"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceInformation/product"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceInformation/version"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceInformation/url"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceInformation/interfaces"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses image="false">
+        <ecoreClass href="model.ecore#//service/ServiceAddress"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceAddress/properties"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//service/ServiceAddress/text"/>
+        </genOperations>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//service/ServiceAddress/addressText"/>
+        </genOperations>
+      </genClasses>
+      <genClasses image="false">
+        <ecoreClass href="model.ecore#//service/UnixSocketAddress"/>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/UnixPathAddress"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/UnixPathAddress/path"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//service/UnixPathAddress/addressText"/>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/UnixAbstractAddress"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/UnixAbstractAddress/name"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//service/UnixAbstractAddress/addressText"/>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/TcpAddress"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/TcpAddress/host"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/TcpAddress/port"/>
+        </genFeatures>
+        <genFeatures property="Readonly" createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/TcpAddress/hostKind"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//service/TcpAddress/addressText"/>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/ServiceRegistry"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/ServiceRegistry/directory"/>
+        </genFeatures>
+        <genFeatures property="None" children="true" createChild="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/ServiceRegistry/entries"/>
+        </genFeatures>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//service/RegistryEntry"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/RegistryEntry/interfaceName"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/RegistryEntry/symlink"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/RegistryEntry/targetPath"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/RegistryEntry/interface"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/RegistryEntry/service"/>
+        </genFeatures>
+        <genFeatures property="None" notify="false" createChild="false">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//service/RegistryEntry/registry"/>
+        </genFeatures>
+        <genFeatures property="Readonly" createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//service/RegistryEntry/path"/>
+        </genFeatures>
+      </genClasses>
+    </nestedGenPackages>
+    <nestedGenPackages prefix="Transport" disposableProviderFactory="true">
+      <ecorePackage href="model.ecore#//transport"/>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//transport/SocketRole"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//transport/SocketRole/client"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//transport/SocketRole/server"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//transport/SocketRole/listen"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//transport/SocketRole/entrypoint"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genClasses>
+        <ecoreClass href="model.ecore#//transport/SocketActivationEnvironment"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketActivationEnvironment/listenFds"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketActivationEnvironment/listenPid"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketActivationEnvironment/listenPidfdId"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketActivationEnvironment/listenFdNames"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//transport/SocketActivationEnvironment/varlinkFileDescriptor"/>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//transport/SocketInode"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketInode/attributeValue"/>
+        </genFeatures>
+        <genFeatures property="Readonly" createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketInode/role"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//transport/SocketInode/path"/>
+        </genFeatures>
+      </genClasses>
+    </nestedGenPackages>
+    <nestedGenPackages prefix="Http" disposableProviderFactory="true">
+      <ecorePackage href="model.ecore#//http"/>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/BridgeUrlScheme"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeUrlScheme/ws"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeUrlScheme/wss"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeUrlScheme/http"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeUrlScheme/https"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/BridgeRoute"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/call"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/callOnService"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/services"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/serviceInformation"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/interfaceMethods"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/webSocket"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeRoute/health"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/BridgeMode"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeMode/simple"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeMode/webSocket"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/MediaType"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/MediaType/applicationJson"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/MediaType/applicationJsonSeq"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/BridgeFailure"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeFailure/transportFailure"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeFailure/malformedRequest"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeFailure/unknownService"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeFailure/authenticationFailed"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/BridgeAuthentication"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeAuthentication/none"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/BridgeAuthentication/mutualTls"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genEnums typeSafeEnumCompatible="false">
+        <ecoreEnum href="model.ecore#//http/HttpStatus"/>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/ok"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/badRequest"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/unauthorized"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/forbidden"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/notFound"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/internalServerError"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/notImplemented"/>
+        </genEnumLiterals>
+        <genEnumLiterals>
+          <ecoreEnumLiteral href="model.ecore#//http/HttpStatus/badGateway"/>
+        </genEnumLiterals>
+      </genEnums>
+      <genClasses>
+        <ecoreClass href="model.ecore#//http/HttpBridge"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridge/baseUrl"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridge/authentication"/>
+        </genFeatures>
+        <genFeatures notify="false" createChild="false" propertySortChoices="true">
+          <ecoreFeature xsi:type="ecore:EReference" href="model.ecore#//http/HttpBridge/services"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridge/statusForError"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//http/HttpBridge/statusForError/errorName"/>
+          </genParameters>
+        </genOperations>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridge/statusForFailure"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//http/HttpBridge/statusForFailure/failure"/>
+          </genParameters>
+        </genOperations>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridge/serviceNameForMethod"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//http/HttpBridge/serviceNameForMethod/qualifiedMethod"/>
+          </genParameters>
+        </genOperations>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridge/callUrl"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//http/HttpBridge/callUrl/qualifiedMethod"/>
+          </genParameters>
+        </genOperations>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridge/webSocketUrl"/>
+          <genParameters>
+            <ecoreParameter href="model.ecore#//http/HttpBridge/webSocketUrl/serviceName"/>
+          </genParameters>
+        </genOperations>
+      </genClasses>
+      <genClasses>
+        <ecoreClass href="model.ecore#//http/HttpBridgeAddress"/>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridgeAddress/scheme"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridgeAddress/host"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridgeAddress/port"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridgeAddress/basePath"/>
+        </genFeatures>
+        <genFeatures createChild="false">
+          <ecoreFeature xsi:type="ecore:EAttribute" href="model.ecore#//http/HttpBridgeAddress/serviceName"/>
+        </genFeatures>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridgeAddress/url"/>
+        </genOperations>
+        <genOperations>
+          <ecoreOperation href="model.ecore#//http/HttpBridgeAddress/addressText"/>
+        </genOperations>
+      </genClasses>
+    </nestedGenPackages>
+  </genPackages>
+</genmodel:GenModel>

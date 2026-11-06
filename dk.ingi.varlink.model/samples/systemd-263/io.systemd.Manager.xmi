@@ -1,0 +1,612 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.Manager">
+  <members xsi:type="varlink:EnumDefinition" name="LogTarget">
+    <body>
+      <values name="console"/>
+      <values name="kmsg"/>
+      <values name="journal"/>
+      <values name="syslog"/>
+      <values name="console_prefixed"/>
+      <values name="journal_or_kmsg"/>
+      <values name="syslog_or_kmsg"/>
+      <values name="auto"/>
+      <values name="null"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="OOMPolicy">
+    <body>
+      <values name="continue"/>
+      <values name="stop"/>
+      <values name="kill"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ExecOutputType">
+    <body>
+      <values name="inherit"/>
+      <values name="null"/>
+      <values name="tty"/>
+      <values name="kmsg"/>
+      <values name="kmsg_console"/>
+      <values name="journal"/>
+      <values name="journal_console"/>
+      <values name="socket"/>
+      <values name="fd"/>
+      <values name="file"/>
+      <values name="append"/>
+      <values name="truncate"/>
+      <values name="broker"/>
+      <values name="broker_log"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="CGroupPressureWatch">
+    <body>
+      <values name="no"/>
+      <values name="yes"/>
+      <values name="auto"/>
+      <values name="skip"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="EmergencyAction">
+    <body>
+      <values name="none"/>
+      <values name="exit"/>
+      <values name="exit_force"/>
+      <values name="reboot"/>
+      <values name="reboot_force"/>
+      <values name="reboot_immediate"/>
+      <values name="poweroff"/>
+      <values name="poweroff_force"/>
+      <values name="poweroff_immediate"/>
+      <values name="soft_reboot"/>
+      <values name="soft_reboot_force"/>
+      <values name="kexec"/>
+      <values name="kexec_force"/>
+      <values name="halt"/>
+      <values name="halt_force"/>
+      <values name="halt_immediate"/>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ManagerContext">
+    <body>
+      <fields name="ShowStatus">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#LogColor=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="LogLevel">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#LogColor=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LogLevelStruct" definition="//@members[name='LogLevelStruct']"/>
+      </fields>
+      <fields name="LogTarget">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#LogColor=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="LogTarget" definition="//@members[name='LogTarget']"/>
+      </fields>
+      <fields name="Environment">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#ManagerEnvironment=</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="DefaultStandardOutput">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultStandardOutput=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ExecOutputType" definition="//@members[name='ExecOutputType']"/>
+      </fields>
+      <fields name="DefaultStandardError">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultStandardError=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ExecOutputType" definition="//@members[name='ExecOutputType']"/>
+      </fields>
+      <fields name="ServiceWatchdogs">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#ServiceWatchdogs=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="DefaultTimerAccuracyUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultTimerAccuracySec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultTimeoutStartUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultTimeoutStartSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultTimeoutStopUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultTimeoutStopSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultTimeoutAbortUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultTimeoutAbortSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultDeviceTimeoutUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultDeviceTimeoutSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultRestartUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultRestartSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultStartLimit">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultStartLimit=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="RateLimit" definition="//@members[name='RateLimit']" nullable="true"/>
+      </fields>
+      <fields name="DefaultIOAccounting">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultIOAccounting=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="DefaultIPAccounting">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultIPAccounting=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="DefaultMemoryAccounting">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultMemoryAccounting=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="DefaultTasksAccounting">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultTasksAccounting=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="DefaultLimits">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultLimitCPU=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimitTable" definition="//@members[name='ResourceLimitTable']"/>
+      </fields>
+      <fields name="DefaultTasksMax">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultTasksMax=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultMemoryPressureThresholdUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultMemoryPressureThresholdUSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultMemoryPressureWatch">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultMemoryPressureWatch=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="CGroupPressureWatch" definition="//@members[name='CGroupPressureWatch']"/>
+      </fields>
+      <fields name="DefaultCPUPressureThresholdUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultCPUPressureThresholdUSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultCPUPressureWatch">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultCPUPressureWatch=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="CGroupPressureWatch" definition="//@members[name='CGroupPressureWatch']"/>
+      </fields>
+      <fields name="DefaultIOPressureThresholdUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultIOPressureThresholdUSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultIOPressureWatch">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultIOPressureWatch=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="CGroupPressureWatch" definition="//@members[name='CGroupPressureWatch']"/>
+      </fields>
+      <fields name="RuntimeWatchdogUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#RuntimeWatchdogSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="RebootWatchdogUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#RebootWatchdogSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="KExecWatchdogUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#KExecWatchdogSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="RuntimeWatchdogPreUSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#RuntimeWatchdogPreSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="RuntimeWatchdogPreGovernor">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#RuntimeWatchdogPreGovernor=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="WatchdogDevice">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#WatchdogDevice=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="TimerSlackNSec">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#TimerSlackNSec=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultOOMPolicy">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultOOMPolicy=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="OOMPolicy" definition="//@members[name='OOMPolicy']"/>
+      </fields>
+      <fields name="DefaultOOMScoreAdjust">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultOOMScoreAdjust=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="DefaultRestrictSUIDSGID">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultRestrictSUIDSGID=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="CtrlAltDelBurstAction">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#CtrlAltDelBurstAction=</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="EmergencyAction" definition="//@members[name='EmergencyAction']"/>
+      </fields>
+      <fields name="ConfirmSpawn">
+        <documentation>The console on which systemd asks for confirmation when spawning processes</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="ControlGroup">
+        <documentation>Root of the control group hierarchy that the manager is running in</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="DefaultMemoryZSwapWriteback">
+        <documentation>https://www.freedesktop.org/software/systemd/man/263/systemd-system.conf.html#DefaultMemoryZSwapWriteback=</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ManagerRuntime">
+    <body>
+      <fields name="Version">
+        <documentation>The version string of the running systemd instance</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Architecture">
+        <documentation>A short ID string describing the architecture the systemd instance is running on</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Features">
+        <documentation>The features that have been enabled and disabled for this build</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="Taints">
+        <documentation>An array of strings describing the taints applied to the running system</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="UnitPath">
+        <documentation>The unit search path</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="Virtualization">
+        <documentation>A short ID string describing the virtualization technology the system runs in</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ConfidentialVirtualization">
+        <documentation>A short ID string describing the confidential virtualization technology the system runs in</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="FirmwareTimestamp">
+        <documentation>Timestamp when the firmware first began execution</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="LoaderTimestamp">
+        <documentation>Timestamp when the boot loader first began execution</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="KernelTimestamp">
+        <documentation>Timestamp when the kernel first began execution</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDTimestamp">
+        <documentation>Timestamp when the initrd first began execution</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="UserspaceTimestamp">
+        <documentation>Timestamp when the initrd first began execution</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="FinishTimestamp">
+        <documentation>Timestamp when the system finished booting up</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="ShutdownStartTimestamp">
+        <documentation>Timestamp when shutdown began, i.e. when units started to be stopped</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="ShutdownFinishTimestamp">
+        <documentation>Timestamp when all units finished stopping during shutdown</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="PreviousShutdownStartTimestamp">
+        <documentation>Timestamp when the previous boot began stopping units, restored across a kexec-based live update</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="PreviousShutdownFinishTimestamp">
+        <documentation>Timestamp when the previous boot finished stopping units, restored across a kexec-based live update</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="PreviousShutdownLateStartTimestamp">
+        <documentation>Timestamp when systemd-shutdown began execution during the previous boot, restored across a kexec-based live update</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="PreviousShutdownLateFinishTimestamp">
+        <documentation>Timestamp when systemd-shutdown was about to kexec into the current kernel, restored across a kexec-based live update</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="SecurityStartTimestamp">
+        <documentation>Timestamp when the manager started uploading security policies to the kernel</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="SecurityFinishTimestamp">
+        <documentation>Timestamp when the manager finished uploading security policies to the kernel</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="GeneratorsStartTimestamp">
+        <documentation>Timestamp when the manager started executing generators</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="GeneratorsFinishTimestamp">
+        <documentation>Timestamp when the manager finished executing generators</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="UnitsLoadStartTimestamp">
+        <documentation>Timestamp when the manager first started loading units</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="UnitsLoadFinishTimestamp">
+        <documentation>Timestamp when the manager first finished loading units</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="UnitsLoadTimestamp">
+        <documentation>Timestamp when the manager last started loading units</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDSecurityStartTimestamp">
+        <documentation>Timestamp when the manager started uploading security policies to the kernel in the initrd</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDSecurityFinishTimestamp">
+        <documentation>Timestamp when the manager finished uploading security policies to the kernel in the initrd</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDGeneratorsStartTimestamp">
+        <documentation>Timestamp when the manager started executing generators in the initrd</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDGeneratorsFinishTimestamp">
+        <documentation>Timestamp when the manager finished executing generators in the initrd</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDUnitsLoadStartTimestamp">
+        <documentation>Timestamp when the manager first started loading units in the initrd</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="InitRDUnitsLoadFinishTimestamp">
+        <documentation>Timestamp when the manager first finished loading units in the initrd</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="NNames">
+        <documentation>The amount of unique unit names currently loaded</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="NFailedUnits">
+        <documentation>The amount of failed units</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="NJobs">
+        <documentation>The amount of currently queued jobs</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="NInstalledJobs">
+        <documentation>The total amount of queued jobs</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="NFailedJobs">
+        <documentation>The total amount of failed jobs</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="TransactionsWithOrderingCycle">
+        <documentation>IDs of transactions that encountered ordering cycle</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="int"/>
+        </type>
+      </fields>
+      <fields name="Progress">
+        <documentation>Boot progress as a floating point value between 0.0 and 1.0</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="float"/>
+      </fields>
+      <fields name="WatchdogLastPingTimestamp">
+        <documentation>Timestamp when the hardware watchdog was last pinged</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="Timestamp" definition="//@members[name='Timestamp']" nullable="true"/>
+      </fields>
+      <fields name="SystemState">
+        <documentation>Current state of the system</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="ExitCode">
+        <documentation>Exit code of the manager</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="SoftRebootsCount">
+        <documentation>Encodes how many soft-reboots were successfully completed</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="KExecCount">
+        <documentation>Encodes how many consecutive kexec reboots were successfully completed since the last full boot. Zero if the Live Update Orchestrator is not available.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+      <fields name="ReloadCount">
+        <documentation>Number of successfully completed configuration reloads</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Timestamp">
+    <body>
+      <fields name="realtime">
+        <documentation>Timestamp in µs in the CLOCK_REALTIME clock (wallclock)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="monotonic">
+        <documentation>Timestamp in µs in the CLOCK_MONOTONIC clock</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResourceLimit">
+    <body>
+      <fields name="soft">
+        <documentation>The soft resource limit. RLIM_INFINITY is mapped to unset value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="hard">
+        <documentation>The hard resource limit. RLIM_INFINITY is mapped to unset value</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="ResourceLimitTable">
+    <body>
+      <fields name="CPU">
+        <documentation>See setrlimit(2) for details</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="FSIZE">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="DATA">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="STACK">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="CORE">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="RSS">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="NOFILE">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="AS">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="NPROC">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="MEMLOCK">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="LOCKS">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="SIGPENDING">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="MSGQUEUE">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="NICE">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="RTPRIO">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+      <fields name="RTTIME">
+        <type xsi:type="varlink:NamedTypeReference" typeName="ResourceLimit" definition="//@members[name='ResourceLimit']" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="RateLimit">
+    <body>
+      <fields name="intervalUSec">
+        <documentation>The ratelimit interval</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="burst">
+        <documentation>The ratelimit burst</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="LogLevelStruct">
+    <body>
+      <fields name="console">
+        <documentation>'console' target log level</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="kmsg">
+        <documentation>'kmsg' target log level</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="syslog">
+        <documentation>'syslog' target log level</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="journal">
+        <documentation>'journal' target log level</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="Describe">
+    <input/>
+    <output>
+      <fields name="context">
+        <documentation>Configuration of the manager</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ManagerContext" definition="//@members[name='ManagerContext']"/>
+      </fields>
+      <fields name="runtime">
+        <documentation>Runtime information of the manager</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ManagerRuntime" definition="//@members[name='ManagerRuntime']"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="Reexecute">
+    <documentation>Reexecute the main manager process</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Reload">
+    <documentation>Reload the manager configuration</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="EnqueueMarkedJobs" moreSupport="supported">
+    <documentation>Enqueue all marked jobs</documentation>
+    <input/>
+    <output>
+      <fields name="unitID">
+        <documentation>Enqueued unit ID</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="jobID">
+        <documentation>ID of enqueued job (if successful)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="int" nullable="true"/>
+      </fields>
+      <fields name="error">
+        <documentation>Varlink error ID (on failure)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="errorMessage">
+        <documentation>Job enqueue error message (on failure)</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="PowerOff">
+    <documentation>Power off the system</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Reboot">
+    <documentation>Reboot the system</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="Halt">
+    <documentation>Halt the system</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="KExec">
+    <documentation>Reboot the system via kexec</documentation>
+    <input/>
+    <output/>
+  </members>
+  <members xsi:type="varlink:Method" name="SoftReboot">
+    <documentation>Soft-reboot the userspace</documentation>
+    <input>
+      <fields name="root">
+        <documentation>New root directory for the soft reboot</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </input>
+    <output/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="RateLimitReached">
+    <parameters/>
+  </members>
+</varlink:Interface>

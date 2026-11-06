@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.SysUpdate" experimental="true">
+  <documentation>APIs to manage system updates</documentation>
+  <members xsi:type="varlink:EnumDefinition" name="TargetClass">
+    <documentation>Class of a Target.</documentation>
+    <body>
+      <values name="machine">
+        <documentation>Container or machine managed by systemd-machined.service(8).</documentation>
+      </values>
+      <values name="portable">
+        <documentation>Portable service.</documentation>
+      </values>
+      <values name="sysext">
+        <documentation>System extension managed by systemd-sysext.service(8).</documentation>
+      </values>
+      <values name="confext">
+        <documentation>Configuration extension managed by systemd-confext.service(8).</documentation>
+      </values>
+      <values name="host">
+        <documentation>Host system.</documentation>
+      </values>
+      <values name="component">
+        <documentation>Component managed by systemd-sysupdate.service(8).</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ComponentSuccessAction">
+    <documentation>Action to take after a component has been updated successfully.</documentation>
+    <body>
+      <values name="continue">
+        <documentation>Continue with the next component</documentation>
+      </values>
+      <values name="restart">
+        <documentation>Finish the current update iteration, and start the next one</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:EnumDefinition" name="ComponentFailureAction">
+    <documentation>Action to take if updating a component failed.</documentation>
+    <body>
+      <values name="continue">
+        <documentation>Continue with the next component, but fail at the very end</documentation>
+      </values>
+      <values name="fail">
+        <documentation>Fail immediately</documentation>
+      </values>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="TargetIdentifier">
+    <documentation>Identifier for a component of the system (i.e. the host itself, a sysext, a confext, etc.) that can be updated by systemd-sysupdate(8).</documentation>
+    <body>
+      <fields name="class">
+        <documentation>Where the target was enumerated.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TargetClass" definition="//@members[name='TargetClass']"/>
+      </fields>
+      <fields name="name">
+        <documentation>Name of the target, unique within a class.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Target">
+    <documentation>Type containing a configured sysupdate target, along with its metadata if it is a component.</documentation>
+    <body>
+      <fields name="id">
+        <documentation>Identifier for the target.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TargetIdentifier" definition="//@members[name='TargetIdentifier']"/>
+      </fields>
+      <fields name="currentVersion">
+        <documentation>The currently installed version of the target, if any.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="allVersions">
+        <documentation>All locally-known versions of the target.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="currentVersionIsPending">
+        <documentation>Whether the current version is installed but pending a reboot to become active. Always set when returned by ListTargets(). Not set by component providers, since this is a property of the local installation.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="appStream">
+        <documentation>URLs to zero or more AppStream catalog XML files describing the target.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="description">
+        <documentation>The following fields carry the metadata of targets of class 'component', mirroring the settings of sysupdate.components(5). They are unset for targets of other classes. A short human readable description of the component.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="documentation">
+        <documentation>URLs to documentation for the component.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="enabled">
+        <documentation>Whether the component is enabled. When returned by ListTargets() this is the effective state and always set for components. If unset, the component is enabled.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="successAction">
+        <documentation>What to do after the component has been updated successfully, see SuccessAction= in sysupdate.components(5).</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ComponentSuccessAction" definition="//@members[name='ComponentSuccessAction']" nullable="true"/>
+      </fields>
+      <fields name="failureAction">
+        <documentation>What to do if updating the component failed, see FailureAction= in sysupdate.components(5).</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="ComponentFailureAction" definition="//@members[name='ComponentFailureAction']" nullable="true"/>
+      </fields>
+      <fields name="suggested">
+        <documentation>Whether the component is suggested for enablement. When returned by ListTargets() this is the evaluated state and always set for components. If unset, the component is not suggested.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="minVersion">
+        <documentation>The minimum version to permit for all transfers of the component, see MinVersion= in sysupdate.components(5).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="maxVersion">
+        <documentation>The maximum version to permit for all transfers of the component, see MaxVersion= in sysupdate.components(5).</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="protectVersion">
+        <documentation>Versions to protect from removal for all transfers of the component, see ProtectVersion= in sysupdate.components(5).</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:StructDefinition" name="Feature">
+    <documentation>Type containing a configured sysupdate feature.</documentation>
+    <body>
+      <fields name="id">
+        <documentation>Identifier for the feature.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="description">
+        <documentation>A short human readable description of the feature.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="documentation">
+        <documentation>URLs to documentation for the feature.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="appStream">
+        <documentation>URLs to zero or more AppStream catalog XML files describing the feature.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+      <fields name="enabled">
+        <documentation>Whether the feature is enabled.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool"/>
+      </fields>
+      <fields name="suggested">
+        <documentation>Whether the feature is suggested for enablement.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+      <fields name="transfers">
+        <documentation>Array of IDs of the transfers (including currently disabled ones) which are controlled by this feature.</documentation>
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:BuiltinType" kind="string"/>
+        </type>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="ListFeatures">
+    <documentation>Show optional features</documentation>
+    <input>
+      <fields name="target">
+        <documentation>Target to list features for.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TargetIdentifier" definition="//@members[name='TargetIdentifier']"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="features">
+        <documentation>The configured features.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Feature" definition="//@members[name='Feature']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="CheckNew">
+    <documentation>Check if there’s a new version available</documentation>
+    <input>
+      <fields name="target">
+        <documentation>Target to check for updates for.</documentation>
+        <type xsi:type="varlink:NamedTypeReference" typeName="TargetIdentifier" definition="//@members[name='TargetIdentifier']"/>
+      </fields>
+      <fields name="allowInteractiveAuthentication">
+        <documentation>Controls whether interactive authentication (via polkit) shall be allowed. If unspecified defaults to false.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="bool" nullable="true"/>
+      </fields>
+    </input>
+    <output>
+      <fields name="available">
+        <documentation>The version string for the new version which is available.</documentation>
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:Method" name="ListTargets">
+    <documentation>Show targets</documentation>
+    <input/>
+    <output>
+      <fields name="targets">
+        <documentation>The configured targets.</documentation>
+        <type xsi:type="varlink:ArrayType">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Target" definition="//@members[name='Target']"/>
+        </type>
+      </fields>
+    </output>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoUpdateNeeded">
+    <documentation>Error indicating that no update is currently available to update to.</documentation>
+    <parameters/>
+  </members>
+  <members xsi:type="varlink:ErrorDefinition" name="NoSuchTarget">
+    <documentation>Error indicating the specified target doesn’t exist</documentation>
+    <parameters/>
+  </members>
+</varlink:Interface>

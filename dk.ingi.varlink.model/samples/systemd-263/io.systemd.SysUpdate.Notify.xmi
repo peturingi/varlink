@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<varlink:Interface xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:varlink="https://ingi.dk/varlink" name="io.systemd.SysUpdate.Notify" experimental="true">
+  <members xsi:type="varlink:StructDefinition" name="Resource">
+    <body>
+      <fields name="transfer">
+        <type xsi:type="varlink:BuiltinType" kind="string"/>
+      </fields>
+      <fields name="path">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+    </body>
+  </members>
+  <members xsi:type="varlink:Method" name="OnCompletedUpdate">
+    <input>
+      <fields name="component">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="version">
+        <type xsi:type="varlink:BuiltinType" kind="string" nullable="true"/>
+      </fields>
+      <fields name="resources">
+        <type xsi:type="varlink:ArrayType" nullable="true">
+          <elementType xsi:type="varlink:NamedTypeReference" typeName="Resource" definition="//@members[name='Resource']"/>
+        </type>
+      </fields>
+    </input>
+    <output/>
+  </members>
+</varlink:Interface>

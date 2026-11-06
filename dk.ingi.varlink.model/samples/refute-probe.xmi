@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xmi:XMI xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:varlink="https://ingi.dk/varlink" xmlns:service="https://ingi.dk/varlink/service" xmlns:transport="https://ingi.dk/varlink/transport" xmlns:http="https://ingi.dk/varlink/http">
+  <!-- /0: must be VALID: flag-marker line in a type's documentation is ordinary text; string-set value struct; error parameters positionPath -->
+  <varlink:Interface name="org.example.probe" source="# doc&#10;interface org.example.probe&#10;">
+    <members xsi:type="varlink:StructDefinition" name="Flagged">
+      <documentation>[Supports 'more' flag]</documentation>
+      <body>
+        <fields name="tags"><type xsi:type="varlink:MapType"><valueType xsi:type="varlink:StructType"/></type></fields>
+        <fields name="inner"><type xsi:type="varlink:StructType"><fields name="x"><type xsi:type="varlink:BuiltinType" kind="int"/></fields></type></fields>
+      </body>
+    </members>
+    <members xsi:type="varlink:ErrorDefinition" name="Boom">
+      <parameters><fields name="more_data"><type xsi:type="varlink:EnumType"><values name="a"/></type></fields></parameters>
+    </members>
+  </varlink:Interface>
+  <!-- /1: must be INVALID: method doc with a flag line, doc entry with embedded newline, source naming another interface -->
+  <varlink:Interface name="org.example.bad" source="interface org.example.other&#10;">
+    <members xsi:type="varlink:Method" name="M">
+      <documentation>[Requires 'more' flag]</documentation>
+      <documentation>two&#10;lines</documentation>
+      <input/><output/>
+    </members>
+  </varlink:Interface>
+  <!-- /2: must be VALID: information-only service with registry entry; trailing-slash registry dir -->
+  <service:Service name="io.example.svc" registryEntries="/3/@entries.0">
+    <information vendor="v" product="p" version="1" url="https://example.org/" interfaces="org.varlink.service io.example.svc"/>
+    <addresses xsi:type="service:UnixPathAddress" path="/run/io.example.svc" properties="a=b"/>
+    <addresses xsi:type="service:TcpAddress" host="fe80::1%eth0" port="4711"/>
+    <addresses xsi:type="service:TcpAddress" host="256.300.1.1" port="1"/>
+    <socketActivation listenFds="2" listenFdNames="other varlink"/>
+  </service:Service>
+  <service:ServiceRegistry directory="/run/varlink/registry/">
+    <entries interfaceName="io.example.svc" service="/2"/>
+    <entries interfaceName="io.example.legacy"/>
+  </service:ServiceRegistry>
+  <!-- /4: must be INVALID: ';' in a unix path, ':' in a hostname, ':' in an fd name -->
+  <service:Service name="io.example.bad">
+    <addresses xsi:type="service:UnixPathAddress" path="/run/x;foo=bar"/>
+    <addresses xsi:type="service:TcpAddress" host="host:name" port="1"/>
+    <socketActivation listenFds="1" listenFdNames="a:b"/>
+  </service:Service>
+</xmi:XMI>
